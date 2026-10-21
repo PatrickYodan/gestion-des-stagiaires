@@ -68,6 +68,18 @@ function AccessMatrix({ userCounts = {} }) {
 
   const editableRoles = config.roles.filter((r) => r !== "ADMIN");
 
+  // Nom du rôle et nombre de comptes, affichés en tête de chaque ligne de rôle sur téléphone
+  const countLabel = (role) => {
+    const n = userCounts[role] || 0;
+    return `${n} compte${n > 1 ? "s" : ""}`;
+  };
+  const roleTag = (role) => (
+    <span className="access-cell-role">
+      <span>{ROLE_LABELS[role] || role}</span>
+      <span className="access-cell-count">{countLabel(role)}</span>
+    </span>
+  );
+
   const changes = [];
   editableRoles.forEach((role) =>
     config.modules.forEach((m) => {
@@ -144,9 +156,7 @@ function AccessMatrix({ userCounts = {} }) {
                     {role === "ADMIN" && <Icon name="lock" size={12} />}
                     {ROLE_LABELS[role] || role}
                   </div>
-                  <span className="access-role-count">
-                    {userCounts[role] || 0} compte{(userCounts[role] || 0) > 1 ? "s" : ""}
-                  </span>
+                  <span className="access-role-count">{countLabel(role)}</span>
                 </th>
               ))}
             </tr>
@@ -174,6 +184,7 @@ function AccessMatrix({ userCounts = {} }) {
                   {config.roles.map((role) =>
                     role === "ADMIN" ? (
                       <td key={role} className="access-cell is-admin" data-label={ROLE_LABELS[role]}>
+                        {roleTag(role)}
                         <span
                           className={`lock-pill ${m.lecture_seule ? "level-1" : "level-2"}`}
                           title="L'administrateur a toujours un accès complet"
@@ -183,6 +194,7 @@ function AccessMatrix({ userCounts = {} }) {
                       </td>
                     ) : (
                       <td key={role} className="access-cell" data-label={ROLE_LABELS[role] || role}>
+                        {roleTag(role)}
                         <div
                           className={`level-control ${
                             draft[role]?.[m.id] !== config.matrice[role]?.[m.id] ? "changed" : ""
@@ -233,6 +245,7 @@ function AccessMatrix({ userCounts = {} }) {
               </td>
               {config.roles.map((role) => (
                 <td key={role} className="access-cell" data-label={ROLE_LABELS[role] || role}>
+                  {roleTag(role)}
                   <span className={`lock-pill ${role === "ADMIN" ? "level-2" : "level-0"}`}>
                     <Icon name="lock" size={12} /> {role === "ADMIN" ? "Complet" : "Aucun"}
                   </span>
@@ -253,6 +266,7 @@ function AccessMatrix({ userCounts = {} }) {
               </td>
               {config.roles.map((role) => (
                 <td key={role} className="access-cell" data-label={ROLE_LABELS[role] || role}>
+                  {roleTag(role)}
                   <span className="lock-pill level-2">
                     <Icon name="lock" size={12} /> Complet
                   </span>

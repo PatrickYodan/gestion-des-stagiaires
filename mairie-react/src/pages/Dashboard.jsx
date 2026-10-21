@@ -16,7 +16,38 @@ import {
 } from "recharts";
 
 const monthsShort = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"];
+const monthsInitial = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
+const MOBILE_QUERY = "(max-width: 640px)";
+
+// Vrai quand l'écran est celui d'un téléphone (mis à jour si la fenêtre change de taille)
+function useIsMobile() {
+  const [mobile, setMobile] = useState(() => window.matchMedia(MOBILE_QUERY).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(MOBILE_QUERY);
+    const onChange = (e) => setMobile(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+  return mobile;
+}
+
 const monthsFull = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+
+// Une couleur par mois (palette qui suit les saisons : hiver bleu, printemps vert, été chaud, automne)
+const monthColors = [
+  "#2563eb", // Janvier
+  "#0891b2", // Février
+  "#0d9488", // Mars
+  "#16a34a", // Avril
+  "#65a30d", // Mai
+  "#ca8a04", // Juin
+  "#ea580c", // Juillet
+  "#dc2626", // Août
+  "#db2777", // Septembre
+  "#9333ea", // Octobre
+  "#7c3aed", // Novembre
+  "#4f46e5", // Décembre
+];
 
 // Infobulle personnalisée du graphique
 function ChartTooltip({ active, payload, total, year }) {
@@ -29,7 +60,7 @@ function ChartTooltip({ active, payload, total, year }) {
         {monthsFull[index]} {year}
       </div>
       <div className="chart-tooltip-row">
-        <span className="chart-tooltip-swatch" />
+        <span className="chart-tooltip-swatch" style={{ background: monthColors[index] }} />
         <span>Stages démarrés</span>
         <strong>{stagiaires}</strong>
       </div>
@@ -46,6 +77,7 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState("chart");
   const [hovered, setHovered] = useState(null);
+  const isMobile = useIsMobile(); // graphique resserré sur téléphone
 
   useEffect(() => {
     fetchDashboardData();
@@ -314,12 +346,12 @@ function Dashboard() {
               description="Aucun stage n'a de date de début sur cette année. Choisissez une autre année ci-dessus."
             />
           ) : view === "chart" ? (
-            <div style={{ width: "100%", height: 300 }}>
+            <div style={{ width: "100%", height: isMobile ? 240 : 300 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
                   data={chartData}
-                  margin={{ top: 16, right: 8, left: -20, bottom: 0 }}
-                  barCategoryGap="22%"
+                  margin={isMobile ? { top: 18, right: 4, left: -30, bottom: 0 } : { top: 16, right: 8, left: -20, bottom: 0 }}
+                  barCategoryGap={isMobile ? "16%" : "22%"}
                   onMouseLeave={() => setHovered(null)}
                 >
                   <CartesianGrid stroke="#eef1f6" vertical={false} />
@@ -327,14 +359,17 @@ function Dashboard() {
                     dataKey="month"
                     tickLine={false}
                     axisLine={{ stroke: "#e6e9f0" }}
-                    tick={{ fill: "#64748b", fontSize: 12 }}
+                    tick={{ fill: "#64748b", fontSize: isMobile ? 11 : 12 }}
+                    interval={0}
+                    tickFormatter={(m, i) => (isMobile ? monthsInitial[i] : m)}
                     dy={6}
                   />
                   <YAxis
                     allowDecimals={false}
                     tickLine={false}
                     axisLine={false}
-                    tick={{ fill: "#94a3b8", fontSize: 12 }}
+                    tick={{ fill: "#94a3b8", fontSize: isMobile ? 10 : 12 }}
+                    width={isMobile ? 40 : 60}
                   />
                   <Tooltip
                     cursor={{ fill: "#f1f5f9", radius: 6 }}
@@ -348,24 +383,37 @@ function Dashboard() {
                       value: `Moy. ${formatNumber(average)}`,
                       position: "insideTopRight",
                       fill: "#64748b",
-                      fontSize: 11,
+                      fontSize: isMobile ? 10 : 11,
                       fontWeight: 600,
                     }}
                   />
+                  {/* Dégradé vertical propre à chaque mois */}
+                  <defs>
+                    {monthColors.map((c, i) => (
+                      <linearGradient key={c} id={`month-grad-${i}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={c} stopOpacity={1} />
+                        <stop offset="100%" stopColor={c} stopOpacity={0.65} />
+                      </linearGradient>
+                    ))}
+                  </defs>
                   <Bar
                     dataKey="stagiaires"
                     name="Stages démarrés"
                     radius={[4, 4, 0, 0]}
-                    maxBarSize={38}
+                    maxBarSize={isMobile ? 22 : 38}
                     onMouseEnter={(_, index) => setHovered(index)}
                   >
                     {chartData.map((d) => {
-                      const emphasized =
-                        hovered === null ? d.index === currentMonth : hovered === d.index;
+                      // Mois survolé (ou mois en cours) en couleur vive, les autres légèrement atténués
+                      const focus = hovered ?? (currentMonth >= 0 ? currentMonth : null);
+                      const dimmed = focus !== null && focus !== d.index;
                       return (
                         <Cell
                           key={d.month}
-                          fill={emphasized ? "#1d4ed8" : "#93b2f2"}
+                          fill={`url(#month-grad-${d.index})`}
+                          fillOpacity={dimmed ? 0.45 : 1}
+                          stroke={dimmed ? "none" : monthColors[d.index]}
+                          strokeWidth={dimmed ? 0 : 1}
                         />
                       );
                     })}
@@ -374,8 +422,8 @@ function Dashboard() {
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="table-wrap">
-              <table className="table table-compact">
+            <div className="table-wrap month-table-wrap">
+              <table className="table table-compact month-table">
                 <thead>
                   <tr>
                     <th>Mois</th>
@@ -385,20 +433,32 @@ function Dashboard() {
                 </thead>
                 <tbody>
                   {chartData.map((d) => (
-                    <tr key={d.month}>
-                      <td>
+                    <tr
+                      key={d.month}
+                      className={`${d.stagiaires === 0 ? "is-zero" : ""} ${d.index === currentMonth ? "is-current" : ""}`}
+                    >
+                      <td className="month-name" style={{ "--month-color": monthColors[d.index] }}>
+                        <span className="month-dot" />
                         {monthsFull[d.index]}
                         {d.index === currentMonth && (
-                          <span className="badge badge-blue" style={{ marginLeft: 8 }}>
-                            Mois en cours
+                          <span className="badge badge-blue current-month-badge">
+                            {isMobile ? "En cours" : "Mois en cours"}
                           </span>
                         )}
                       </td>
-                      <td className="num">{d.stagiaires}</td>
-                      <td className="num">
+                      <td className="num month-count">
+                        {d.stagiaires}
+                        <span className="month-count-unit"> stage{d.stagiaires > 1 ? "s" : ""}</span>
+                      </td>
+                      <td className="num month-share">
                         <div className="share">
                           <span className="share-bar">
-                            <span style={{ width: `${(d.stagiaires / peak.stagiaires) * 100}%` }} />
+                            <span
+                              style={{
+                                width: `${(d.stagiaires / peak.stagiaires) * 100}%`,
+                                background: monthColors[d.index],
+                              }}
+                            />
                           </span>
                           {Math.round((d.stagiaires / totalStages) * 100)}%
                         </div>
@@ -413,8 +473,16 @@ function Dashboard() {
 
         {!loading && totalStages > 0 && view === "chart" && (
           <div className="chart-legend">
-            <span><i style={{ background: "#1d4ed8" }} /> {currentMonth >= 0 ? "Mois en cours / survolé" : "Mois survolé"}</span>
-            <span><i style={{ background: "#93b2f2" }} /> Autres mois</span>
+            <span className="legend-months" aria-label="Une couleur par mois">
+              {monthColors.map((c, i) => (
+                <i key={c} style={{ background: c }} title={monthsFull[i]} />
+              ))}
+              Une couleur par mois
+            </span>
+            <span>
+              <i style={{ background: "#94a3b8", opacity: 0.45 }} />
+              {currentMonth >= 0 ? "Atténué : autres que le mois en cours / survolé" : "Atténué : autres que le mois survolé"}
+            </span>
             <span><i className="dash" /> Moyenne mensuelle</span>
           </div>
         )}

@@ -125,6 +125,7 @@ function Stages() {
   const [formData, setFormData] = useState(emptyForm);
   const [formError, setFormError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [notice, setNotice] = useState(""); // confirmation après une affectation (encadrant prévenu)
 
   const loadData = () =>
     Promise.all([
@@ -191,6 +192,12 @@ function Stages() {
       tuteur: formData.tuteur ? Number(formData.tuteur) : null,
     };
 
+    // Nouvel encadrant (création, ou changement d'encadrant) : le serveur le prévient automatiquement
+    const nouvelEncadrant =
+      payload.tuteur && (!editing.id || Number(editing.tuteur) !== payload.tuteur)
+        ? tuteurs.find((t) => t.id === payload.tuteur)
+        : null;
+
     setSaving(true);
     try {
       if (editing.id) {
@@ -199,6 +206,11 @@ function Stages() {
         await api.post("stages/", payload);
       }
       setEditing(null);
+      setNotice(
+        nouvelEncadrant
+          ? `${fullName(nouvelEncadrant)} a été prévenu(e) de cette affectation par message et par e-mail.`
+          : "",
+      );
       loadData();
     } catch (err) {
       setFormError(apiErrorMessage(err, "Erreur lors de l'enregistrement du stage."));
@@ -259,6 +271,22 @@ function Stages() {
           </button>
         )}
       </div>
+
+      {notice && (
+        <div className="alert alert-success" role="status">
+          <Icon name="check" size={18} />
+          <span>{notice}</span>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm btn-icon"
+            style={{ marginLeft: "auto" }}
+            onClick={() => setNotice("")}
+            aria-label="Fermer"
+          >
+            <Icon name="x" size={15} />
+          </button>
+        </div>
+      )}
 
       {error && (
         <div className="alert alert-error">

@@ -184,6 +184,10 @@ class Document(models.Model):
         default='AUTRE',
         verbose_name='Type de document',
     )
+    # Type saisi librement quand « Autre document » est choisi (ex. « Fiche d'évaluation »)
+    type_precision = models.CharField(
+        max_length=100, blank=True, default='', verbose_name='Type précisé'
+    )
     chemin_fichier = models.FileField(
         upload_to='document_stages/', verbose_name='Fichier'
     )

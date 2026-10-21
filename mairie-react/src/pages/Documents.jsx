@@ -13,7 +13,11 @@ const TYPES = {
   AUTRE: { label: "Autre document", short: "Autres", tone: "tone-slate", badge: "" },
 };
 
-const emptyForm = { nom_fichier: "", type_doc: "CONVENTIONS", stage: "" };
+const emptyForm = { nom_fichier: "", type_doc: "CONVENTIONS", type_precision: "", stage: "" };
+
+// Libellé affiché d'un document : le type précisé pour « Autre document »
+const typeLabel = (doc) =>
+  doc.type_doc === "AUTRE" && doc.type_precision ? doc.type_precision : (TYPES[doc.type_doc] || TYPES.AUTRE).label;
 
 const extensionOf = (url) => {
   const match = String(url || "").split("?")[0].match(/\.([a-z0-9]+)$/i);
@@ -97,6 +101,7 @@ function Documents() {
     const data = new FormData();
     data.append("nom_fichier", formData.nom_fichier);
     data.append("type_doc", formData.type_doc);
+    data.append("type_precision", formData.type_doc === "AUTRE" ? formData.type_precision.trim() : "");
     data.append("stage", formData.stage);
     data.append("chemin_fichier", file);
 
@@ -135,12 +140,12 @@ function Documents() {
     .filter((d) => {
       if (!query) return true;
       const { title, sub } = stageLabel(d.stage);
-      return [d.nom_fichier, title, sub].join(" ").toLowerCase().includes(query);
+      return [d.nom_fichier, d.type_precision, title, sub].join(" ").toLowerCase().includes(query);
     })
     .sort((a, b) => String(b.date_ajout).localeCompare(String(a.date_ajout)));
 
   return (
-    <div>
+    <div className="docs-page">
       <div className="page-header">
         <div>
           <div className="page-eyebrow">Documents</div>
@@ -252,7 +257,9 @@ function Documents() {
                   </div>
 
                   <div className="entity-meta" style={{ alignItems: "center" }}>
-                    <span className={`badge ${type.badge}`}>{type.label}</span>
+                    <span className={`badge ${type.badge} truncate`} title={typeLabel(doc)}>
+                      {typeLabel(doc)}
+                    </span>
                     <div className="row-actions" style={{ marginLeft: "auto" }}>
                       {doc.chemin_fichier && (
                         <a
@@ -261,7 +268,7 @@ function Documents() {
                           target="_blank"
                           rel="noreferrer"
                         >
-                          <Icon name="external" size={14} /> Ouvrir
+                          <Icon name="external" size={14} /> <span>Ouvrir</span>
                         </a>
                       )}
                       {canEdit && (
@@ -335,6 +342,31 @@ function Documents() {
                 ))}
               </select>
             </div>
+
+            {/* « Autre document » : champ libre pour préciser le type */}
+            {formData.type_doc === "AUTRE" && (
+              <div className="field span-2 field-reveal">
+                <label className="label" htmlFor="type_precision">Précisez le type de document</label>
+                <input
+                  id="type_precision"
+                  name="type_precision"
+                  className="input"
+                  value={formData.type_precision}
+                  onChange={handleChange}
+                  placeholder="ex. Fiche d'évaluation, Certificat médical, Lettre de recommandation…"
+                  maxLength={100}
+                  list="types-precises"
+                  autoFocus
+                  required
+                />
+                <datalist id="types-precises">
+                  {[...new Set(documents.map((d) => d.type_precision).filter(Boolean))].map((t) => (
+                    <option key={t} value={t} />
+                  ))}
+                </datalist>
+                <span className="field-hint">Ce libellé s'affichera sur la carte du document à la place de « Autre document ».</span>
+              </div>
+            )}
           </div>
         </Modal>
       )}

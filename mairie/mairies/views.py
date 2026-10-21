@@ -19,6 +19,7 @@ from rest_framework.exceptions import PermissionDenied
 from .acces import Connecte, EstAdmin, GestionUtilisateursPermission, ModulePermission, est_admin, est_tuteur
 from .invitations import email_en_mode_console, envoyer_lien_reinitialisation, inviter
 from .models import AccesRole, Document, Etablissement, Service, Stage, Stagiaire, Utilisateur
+from .notifications import notifier_affectation
 from .serializers import (
     ChangerMotDePasseSerializer,
     DocumentSerializer,
@@ -129,6 +130,17 @@ class StageViewSet(viewsets.ModelViewSet):
     if est_tuteur(self.request.user):
       queryset = queryset.filter(tuteur=self.request.user)
     return queryset
+
+  # L'encadrant est prévenu (messagerie + e-mail) quand un stagiaire lui est affecté
+  def perform_create(self, serializer):
+    stage = serializer.save()
+    notifier_affectation(stage, self.request.user)
+
+  def perform_update(self, serializer):
+    ancien_tuteur_id = serializer.instance.tuteur_id
+    stage = serializer.save()
+    if stage.tuteur_id and stage.tuteur_id != ancien_tuteur_id:
+      notifier_affectation(stage, self.request.user)
 
 
 class DocumentViewSet(viewsets.ModelViewSet):

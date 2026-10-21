@@ -158,3 +158,12 @@ class DocumentSerializer(serializers.ModelSerializer):
   class Meta:
     model = Document
     fields = '__all__'
+
+  # « Autre document » : le type doit être précisé ; pour les autres types, la précision est ignorée
+  def validate(self, attrs):
+    type_doc = attrs.get('type_doc', getattr(self.instance, 'type_doc', 'AUTRE'))
+    precision = (attrs.get('type_precision', getattr(self.instance, 'type_precision', '')) or '').strip()
+    if type_doc == 'AUTRE' and not precision:
+      raise serializers.ValidationError({'type_precision': 'Précisez le type de document.'})
+    attrs['type_precision'] = precision if type_doc == 'AUTRE' else ''
+    return attrs
