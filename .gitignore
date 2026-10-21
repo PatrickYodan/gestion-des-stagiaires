@@ -2,7 +2,7 @@
 .env
 *.sqlite3
 mairie/media/
-passwords.md
+password.md
 
 # Python
 __pycache__/
@@ -13,3 +13,5 @@ node_modules/
 dist/
 *.local
 *.log
+mairie/staticfiles/
+.vercel
