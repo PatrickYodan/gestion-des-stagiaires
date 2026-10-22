@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "./context/AuthContext";
 import Login from "./pages/Login";
 import Navbar from "./components/layout/Navbar";
+import Footer from "./components/layout/Footer";
 import Sidebar from "./components/layout/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import Stagiaires from "./pages/Stagiaires";
@@ -175,6 +176,8 @@ function App() {
           {currentTab === "messagerie" && <Messagerie />}
           {currentTab === "compte" && <MonCompte />}
         </main>
+
+        <Footer />
       </div>
     </div>
   );

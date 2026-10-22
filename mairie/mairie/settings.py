@@ -19,10 +19,14 @@ except ImportError:
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-g&^3sjic+@4r@0l(ma2&!a)=b&$dh!vqjn@qad3dphs-yj#8&)'
+# En production, définir SECRET_KEY dans le fichier .env du serveur.
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY', 'django-insecure-g&^3sjic+@4r@0l(ma2&!a)=b&$dh!vqjn@qad3dphs-yj#8&)'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# En production : DEBUG=0 dans le fichier .env du serveur.
+DEBUG = os.environ.get('DEBUG', '1') == '1'
 
 
 
@@ -147,6 +151,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+# Dossier rempli par « collectstatic » et servi directement par le serveur web en production
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Media files (Fichiers téléversés : documents de stage, etc.)
 MEDIA_URL = '/media/'
@@ -164,6 +170,10 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r'^http://(192\.168\.\d{1,3}|10\.\d{1,3}\.\d{1,3})\.\d{1,3}:(5173|3000)$',
     r'^http://172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}:(5173|3000)$',
 ]
+# Application déployée (ex. https://mairie.vercel.app) : CORS_ALLOWED_ORIGINS dans .env (séparées par des virgules)
+CORS_ALLOWED_ORIGINS += [o.strip() for o in os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',') if o.strip()]
+# Origines HTTPS autorisées pour les formulaires (interface /admin en production)
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',') if o.strip()]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

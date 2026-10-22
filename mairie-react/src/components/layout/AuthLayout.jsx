@@ -1,4 +1,5 @@
 import Icon from "../ui/Icon";
+import Footer from "./Footer";
 
 // Mise en page des écrans hors connexion (connexion, mot de passe oublié, réinitialisation) :
 // panneau de présentation à gauche, contenu à droite.
@@ -49,7 +50,10 @@ function AuthLayout({ children }) {
         </div>
       </aside>
 
-      <main className="login-panel">{children}</main>
+      <main className="login-panel">
+        {children}
+        <Footer className="app-footer-auth" />
+      </main>
     </div>
   );
 }

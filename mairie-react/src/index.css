@@ -6710,3 +6710,62 @@ textarea.input.chat-input:focus {
     white-space: nowrap;
   }
 }
+
+/* ==========================================================================
+   Pied de page (crédits)
+   ========================================================================== */
+.app-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem 0.75rem;
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 1.1rem 2rem 1.4rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.app-footer strong {
+  color: var(--text-2);
+  font-weight: 600;
+}
+
+.app-footer-sep {
+  color: var(--subtle);
+}
+
+/* Écrans de connexion : crédits sous le formulaire, en bas du panneau */
+.login-panel {
+  grid-template-rows: 1fr auto;
+}
+
+.app-footer-auth {
+  align-self: end;
+  padding: 1.25rem 0 0;
+  border-top: 0;
+}
+
+@media (max-width: 640px) {
+  .app-footer {
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 1rem 1rem calc(1.1rem + env(safe-area-inset-bottom));
+    font-size: 0.74rem;
+  }
+
+  .app-footer-sep {
+    display: none;
+  }
+}
+
+/* Messagerie en plein écran sur téléphone : pas de pied de page sous la discussion */
+@media (max-width: 860px) {
+  .app-main:has(.messagerie-page) .app-footer {
+    display: none;
+  }
+}

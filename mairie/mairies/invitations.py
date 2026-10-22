@@ -34,13 +34,22 @@ def generer_username(email):
     return username
 
 
+# Type de compte annoncé dans l'e-mail d'invitation, selon le rôle
+TYPES_COMPTE = {
+    'TUTEUR': 'encadrant',
+    'RH': 'agent des ressources humaines',
+    'ADMIN': 'administrateur',
+}
+
+
 def envoyer_identifiants(user, mot_de_passe):
     """Envoie l'e-mail d'invitation. Retourne True si l'envoi a réussi."""
     url = getattr(settings, 'FRONTEND_URL', 'http://localhost:5173')
+    type_compte = TYPES_COMPTE.get(user.role, 'utilisateur')
     sujet = 'Vos identifiants — Gestion des Stagiaires (Mairie)'
     texte = (
         'Bonjour,\n\n'
-        'Un compte encadrant a été créé pour vous sur la plateforme de gestion des stagiaires de la Mairie.\n\n'
+        f'Un compte {type_compte} a été créé pour vous sur la plateforme de gestion des stagiaires de la Mairie.\n\n'
         'Vos identifiants de connexion :\n'
         f'  • Adresse e-mail : {user.email}\n'
         f'  • Mot de passe provisoire : {mot_de_passe}\n\n'
@@ -58,7 +67,7 @@ def envoyer_identifiants(user, mot_de_passe):
       </div>
       <div style="border:1px solid #e6e9f0;border-top:0;padding:24px;border-radius:0 0 12px 12px">
         <p>Bonjour,</p>
-        <p>Un compte <strong>encadrant</strong> a été créé pour vous sur la plateforme de gestion des stagiaires.</p>
+        <p>Un compte <strong>{type_compte}</strong> a été créé pour vous sur la plateforme de gestion des stagiaires.</p>
         <table style="width:100%;background:#f4f6fb;border-radius:8px;padding:12px;font-size:14px">
           <tr><td style="color:#64748b;padding:4px 8px">Adresse e-mail</td><td style="padding:4px 8px"><strong>{user.email}</strong></td></tr>
           <tr><td style="color:#64748b;padding:4px 8px">Mot de passe provisoire</td>
