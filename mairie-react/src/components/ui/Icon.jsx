@@ -1,4 +1,4 @@
-// Jeu d'icônes SVG (tracés inspirés de Lucide) — aucune dépendance externe.
+// Jeu d'icônes SVG de l'application (trait fin + aplat « duotone ») — aucune dépendance externe.
 const paths = {
   landmark: (
     <>
@@ -356,7 +356,46 @@ const paths = {
   ),
 };
 
-function Icon({ name, size = 18, strokeWidth = 2, className = "" }) {
+// Style « duotone » propre à l'application : un aplat léger de la même couleur que le trait,
+// placé derrière les formes principales des icônes les plus utilisées.
+const duo = {
+  dashboard: (
+    <>
+      <rect x="3" y="3" width="7" height="9" rx="1" />
+      <rect x="14" y="12" width="7" height="9" rx="1" />
+    </>
+  ),
+  graduation: (
+    <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z" />
+  ),
+  userCheck: <circle cx="9" cy="7" r="4" />,
+  users: <circle cx="9" cy="7" r="4" />,
+  user: <circle cx="12" cy="8" r="4" />,
+  clipboard: <rect x="4" y="4" width="16" height="18" rx="2" />,
+  building: <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />,
+  folder: (
+    <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
+  ),
+  messages: <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z" />,
+  settings: <circle cx="12" cy="12" r="3" />,
+  fileText: <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />,
+  calendar: <path d="M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4H3z" />,
+  mail: <rect x="2" y="4" width="20" height="16" rx="2" />,
+  shield: (
+    <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+  ),
+  archive: <rect x="2" y="3" width="20" height="5" rx="1" />,
+  briefcase: <rect x="2" y="7" width="20" height="14" rx="2" />,
+  lock: <rect x="3" y="11" width="18" height="11" rx="2" />,
+  clock: <circle cx="12" cy="12" r="10" />,
+  idCard: <rect x="3" y="4" width="18" height="16" rx="2" />,
+  monitor: <rect x="2" y="3" width="20" height="14" rx="2" />,
+  heart: (
+    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+  ),
+};
+
+function Icon({ name, size = 18, strokeWidth = 1.8, className = "", duotone = true }) {
   return (
     <svg
       className={`icon ${className}`}
@@ -370,6 +409,11 @@ function Icon({ name, size = 18, strokeWidth = 2, className = "" }) {
       strokeLinejoin="round"
       aria-hidden="true"
     >
+      {duotone && duo[name] && (
+        <g className="icon-duo" fill="currentColor" stroke="none">
+          {duo[name]}
+        </g>
+      )}
       {paths[name]}
     </svg>
   );

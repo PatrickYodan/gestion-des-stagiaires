@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import AuthLayout from "../components/layout/AuthLayout";
 import Icon from "../components/ui/Icon";
 import { FORGOT_PATH, handleLinkClick } from "../utils/router";
+import Logo from "../components/ui/Logo";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -44,7 +45,7 @@ function Login() {
     <AuthLayout>
         <form onSubmit={handleSubmit} className="login-form">
           <div className="brand-mark">
-            <Icon name="landmark" size={20} />
+            <Logo size={40} />
           </div>
 
           <div>

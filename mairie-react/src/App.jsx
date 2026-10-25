@@ -3,6 +3,7 @@ import { useAuth } from "./context/AuthContext";
 import Login from "./pages/Login";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
+import Loader from "./components/ui/Loader";
 import Sidebar from "./components/layout/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import Stagiaires from "./pages/Stagiaires";
@@ -43,6 +44,9 @@ const TITLES = {
   compte: "Mon compte",
 };
 
+const SPLASH_MS = 1600;
+const SPLASH_KEY = "ecran_chargement_vu";
+
 function App() {
   const { user, can, accessReady } = useAuth();
   // L'onglet affiché est déterminé par l'adresse (ex. /stagiaires), ce qui permet
@@ -58,6 +62,41 @@ function App() {
       return false;
     }
   }); // ordinateur : barre réduite aux icônes
+
+  // Écran de chargement affiché au moins SPLASH_MS après la connexion (une fois par session),
+  // pour qu'il soit lisible au lieu de clignoter quand le serveur répond très vite.
+  const [splashDoneFor, setSplashDoneFor] = useState(null); // utilisateur pour qui l'attente minimale est écoulée
+  const splashVu = (() => {
+    try {
+      return sessionStorage.getItem(SPLASH_KEY) === "1";
+    } catch {
+      return true;
+    }
+  })();
+
+  useEffect(() => {
+    if (!user) {
+      // Déconnexion : la prochaine connexion affichera de nouveau l'écran de chargement
+      try {
+        sessionStorage.removeItem(SPLASH_KEY);
+      } catch {
+        // stockage indisponible : sans effet
+      }
+      return undefined;
+    }
+    if (user.doit_changer_mdp || splashVu) return undefined;
+    const timer = setTimeout(() => {
+      try {
+        sessionStorage.setItem(SPLASH_KEY, "1");
+      } catch {
+        // stockage indisponible : l'écran s'affichera à chaque chargement
+      }
+      setSplashDoneFor(user);
+    }, SPLASH_MS);
+    return () => clearTimeout(timer);
+  }, [user, splashVu]);
+
+  const splashEnCours = Boolean(user) && !splashVu && splashDoneFor !== user;
 
   const ready = Boolean(user && !user.doit_changer_mdp && accessReady);
   // Onglet réellement affiché : celui de l'adresse s'il est autorisé, sinon le premier accessible
@@ -119,11 +158,14 @@ function App() {
     return <PremiereConnexion />;
   }
 
-  if (!accessReady) {
+  if (!accessReady || splashEnCours) {
     return (
       <div className="app-loading">
-        <span className="spinner spinner-dark" />
-        Chargement de votre espace…
+        <Loader
+          label="Chargement de votre espace"
+          greeting={user.prenom ? `Bonjour ${user.prenom}` : "Bonjour"}
+          duration={splashVu ? 0 : SPLASH_MS}
+        />
       </div>
     );
   }
@@ -166,6 +208,8 @@ function App() {
         />
 
         <main className="app-content">
+          {/* La clé relance l'animation d'entrée à chaque changement d'onglet */}
+          <div className="page-view" key={currentTab}>
           {currentTab === "dashboard" && <Dashboard />}
           {currentTab === "stagiaires" && <Stagiaires />}
           {currentTab === "tuteurs" && <Tuteurs />}
@@ -175,6 +219,7 @@ function App() {
           {currentTab === "documents" && <Documents />}
           {currentTab === "messagerie" && <Messagerie />}
           {currentTab === "compte" && <MonCompte />}
+          </div>
         </main>
 
         <Footer />

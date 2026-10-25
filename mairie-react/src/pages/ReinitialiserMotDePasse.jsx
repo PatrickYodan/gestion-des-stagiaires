@@ -5,6 +5,7 @@ import Icon from "../components/ui/Icon";
 import { apiErrorMessage } from "../utils/format";
 import { passwordScore, scoreLabels } from "../utils/password";
 import { FORGOT_PATH, LOGIN_PATH, handleLinkClick, navigate } from "../utils/router";
+import Logo from "../components/ui/Logo";
 
 // Choix d'un nouveau mot de passe depuis le lien reçu par e-mail (/reinitialiser-mot-de-passe?uid=…&token=…)
 function ReinitialiserMotDePasse() {
@@ -105,8 +106,8 @@ function ReinitialiserMotDePasse() {
     <AuthLayout>
       <form onSubmit={handleSubmit} className="login-form">
         <div className="brand-mark">
-          <Icon name="landmark" size={20} />
-        </div>
+            <Logo size={40} />
+          </div>
 
         <div>
           <h1 className="login-title">Nouveau mot de passe</h1>

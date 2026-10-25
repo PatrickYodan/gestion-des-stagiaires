@@ -108,3 +108,76 @@ def notifier_affectation(stage, auteur):
         transaction.on_commit(
             lambda: threading.Thread(target=_email, args=(stage, auteur, texte), daemon=True).start()
         )
+
+
+# --- Workflow de validation du stage -----------------------------------------------------
+
+def envoyer_message(auteur, destinataire, texte):
+    """Message interne d'un utilisateur à un autre (conversation créée si besoin). Ne lève jamais d'erreur."""
+    if destinataire is None or auteur is None or destinataire.pk == auteur.pk or not destinataire.is_active:
+        return
+    try:
+        conversation = _conversation_entre(auteur, destinataire)
+        message = Message.objects.create(conversation=conversation, auteur=auteur, contenu=texte)
+        conversation.mis_a_jour_le = message.envoye_le
+        conversation.save(update_fields=['mis_a_jour_le'])
+        EtatConversation.objects.update_or_create(
+            conversation=conversation, utilisateur=destinataire, defaults={'archivee': False}
+        )
+    except Exception:
+        logger.exception('Échec du message de workflow à %s', destinataire)
+
+
+def _resume(stage):
+    st = stage.stagiaire
+    return f'{st.prenom} {st.nom} — « {stage.intitule} » ({stage.service.nom})'
+
+
+def notifier_evaluation(stage, auteur):
+    """L'encadrant a évalué et validé le stage : les agents RH sont prévenus."""
+    from .models import Utilisateur
+
+    texte = (
+        '📝 Stage à valider\n\n'
+        f'{_nom(auteur)} a évalué et validé le stage de {_resume(stage)}.\n'
+        f'• Note proposée : {float(stage.gratification):g} / 20\n\n'
+        "Le dossier attend votre validation finale : ouvrez « Suivi » sur ce stage "
+        "dans l'onglet « Affectations & Stages »."
+    )
+    for rh in Utilisateur.objects.filter(role='RH', is_active=True, statut_compte='ACTIF'):
+        envoyer_message(auteur, rh, texte)
+
+
+def notifier_cloture(stage, auteur):
+    """L'agent RH a validé : l'encadrant est informé de la clôture."""
+    texte = (
+        '✅ Stage clôturé\n\n'
+        f'Le stage de {_resume(stage)} a été validé par {_nom(auteur)}.\n'
+        'Son statut est désormais « Terminé » et la fiche de notes est disponible '
+        'dans « Documents & Attestations ».'
+    )
+    envoyer_message(auteur, stage.tuteur, texte)
+
+
+def notifier_retour(stage, auteur, motif):
+    """L'agent RH renvoie le dossier à l'encadrant, avec le motif."""
+    texte = (
+        '↩️ Dossier renvoyé\n\n'
+        f'{_nom(auteur)} vous renvoie le dossier de {_resume(stage)} pour correction.\n\n'
+        f'Motif : {motif}\n\n'
+        "Ouvrez « Suivi » sur ce stagiaire dans « Mes Stagiaires » pour reprendre l'évaluation."
+    )
+    envoyer_message(auteur, stage.tuteur, texte)
+
+
+def notifier_reouverture(stage, auteur, motif):
+    """L'agent RH rouvre un stage terminé : l'encadrant doit refaire l'évaluation."""
+    texte = (
+        '🔄 Stage rouvert\n\n'
+        f'{_nom(auteur)} a rouvert le stage de {_resume(stage)}.\n\n'
+        f'Motif : {motif}\n\n'
+        "La fiche de notes a été réinitialisée : ouvrez « Suivi » sur ce stagiaire dans « Mes Stagiaires » "
+        "pour refaire l'évaluation. Le dossier repassera ensuite par la validation RH."
+    )
+    envoyer_message(auteur, stage.tuteur, texte)
+

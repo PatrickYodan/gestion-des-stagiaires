@@ -11,6 +11,7 @@ import InvitationNotice from "../components/utilisateurs/InvitationNotice";
 import AccessMatrix from "../components/utilisateurs/AccessMatrix";
 import { apiErrorMessage, fullName } from "../utils/format";
 import { ROLES } from "../utils/roles";
+import { SkeletonRows } from "../components/ui/Skeleton";
 
 function Utilisateurs() {
   const { user: currentUser } = useAuth();
@@ -202,11 +203,7 @@ Un mot de passe provisoire sera envoyé à ${u.email} et devra être changé à 
         </div>
 
         {loading ? (
-          <div className="card-body">
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="skeleton" style={{ height: 48, marginBottom: 10 }} />
-            ))}
-          </div>
+          <SkeletonRows rows={5} columns={3} />
         ) : filtered.length === 0 ? (
           <EmptyState
             icon="users"
@@ -214,8 +211,8 @@ Un mot de passe provisoire sera envoyé à ${u.email} et devra être changé à 
             description="Aucun compte ne correspond à ces filtres."
           />
         ) : (
-          <div className="table-wrap">
-            <table className="table">
+          <div className="table-wrap users-wrap">
+            <table className="table users-table">
               <thead>
                 <tr>
                   <th>Utilisateur</th>
@@ -226,12 +223,16 @@ Un mot de passe provisoire sera envoyé à ${u.email} et devra être changé à 
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((u) => {
+                {filtered.map((u, i) => {
                   const role = ROLES[u.role] || { label: u.role, badge: "" };
                   const isSelf = u.id === currentUser?.id;
                   const actif = u.statut_compte === "ACTIF";
                   return (
-                    <tr key={u.id}>
+                    <tr
+                      key={u.id}
+                      className={`role-${String(u.role).toLowerCase()} ${isSelf ? "is-self" : ""} ${actif ? "" : "is-inactive"}`}
+                      style={{ "--i": Math.min(i, 15) }}
+                    >
                       <td>
                         <div className="person">
                           <Avatar src={u.photo} prenom={u.prenom || u.username} nom={u.nom} />

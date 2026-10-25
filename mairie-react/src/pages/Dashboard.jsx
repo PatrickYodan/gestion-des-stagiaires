@@ -3,6 +3,7 @@ import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 import Icon from "../components/ui/Icon";
 import EmptyState from "../components/ui/EmptyState";
+import { SkeletonChart } from "../components/ui/Skeleton";
 import {
   ResponsiveContainer,
   BarChart,
@@ -79,72 +80,71 @@ function Dashboard() {
   const [hovered, setHovered] = useState(null);
   const isMobile = useIsMobile(); // graphique resserré sur téléphone
 
+  // Chargement des statistiques, une seule fois à l'ouverture de la page
   useEffect(() => {
+    const fetchDashboardData = async () => {
+      let totalStagiaires = 0;
+      let totalEncadrants = 0;
+      let totalServices = 0;
+      let dates = [];
+
+      // 1. Récupération des Stagiaires
+      try {
+        const resStagiaires = await api.get("stagiaires/");
+        totalStagiaires = resStagiaires.data ? resStagiaires.data.length : 0;
+      } catch (err) {
+        console.error("Erreur stagiaires:", err);
+      }
+
+      // 2. Récupération des Utilisateurs / Encadrants
+      try {
+        const resUsers = await api.get("utilisateurs/");
+        if (Array.isArray(resUsers.data)) {
+          totalEncadrants = resUsers.data.filter(
+            (u) => u.role === "TUTEUR" || u.role === "ENCADRANT"
+          ).length;
+        }
+      } catch (err) {
+        console.error("Erreur utilisateurs:", err);
+      }
+
+      // 3. Récupération des services
+      try {
+        const resServices = await api.get("services/");
+        totalServices = resServices.data ? resServices.data.length : 0;
+      } catch (err) {
+        console.error("Erreur services:", err);
+      }
+
+      // 4. Récupération des Stages pour construire le graphique
+      try {
+        const resStages = await api.get("stages/");
+        if (Array.isArray(resStages.data)) {
+          // Lecture directe de "AAAA-MM-JJ" pour éviter les décalages de fuseau horaire
+          dates = resStages.data
+            .filter((stage) => stage.date_debut)
+            .map((stage) => ({
+              year: Number(String(stage.date_debut).slice(0, 4)),
+              month: Number(String(stage.date_debut).slice(5, 7)) - 1,
+            }))
+            .filter((d) => !Number.isNaN(d.year) && d.month >= 0 && d.month < 12);
+        }
+      } catch (err) {
+        console.error("Erreur stages:", err);
+      }
+
+      setStats({ stagiaires: totalStagiaires, encadrants: totalEncadrants, services: totalServices });
+      setStageDates(dates);
+      // Année par défaut : l'année en cours si elle a des stages, sinon la plus récente
+      const thisYear = new Date().getFullYear();
+      if (dates.length && !dates.some((d) => d.year === thisYear)) {
+        setSelectedYear(Math.max(...dates.map((d) => d.year)));
+      }
+      setLoading(false);
+    };
+
     fetchDashboardData();
   }, []);
-
-  const fetchDashboardData = async () => {
-    setLoading(true);
-
-    let totalStagiaires = 0;
-    let totalEncadrants = 0;
-    let totalServices = 0;
-    let dates = [];
-
-    // 1. Récupération des Stagiaires
-    try {
-      const resStagiaires = await api.get("stagiaires/");
-      totalStagiaires = resStagiaires.data ? resStagiaires.data.length : 0;
-    } catch (err) {
-      console.error("Erreur stagiaires:", err);
-    }
-
-    // 2. Récupération des Utilisateurs / Encadrants
-    try {
-      const resUsers = await api.get("utilisateurs/");
-      if (Array.isArray(resUsers.data)) {
-        totalEncadrants = resUsers.data.filter(
-          (u) => u.role === "TUTEUR" || u.role === "ENCADRANT"
-        ).length;
-      }
-    } catch (err) {
-      console.error("Erreur utilisateurs:", err);
-    }
-
-    // 3. Récupération des services
-    try {
-      const resServices = await api.get("services/");
-      totalServices = resServices.data ? resServices.data.length : 0;
-    } catch (err) {
-      console.error("Erreur services:", err);
-    }
-
-    // 4. Récupération des Stages pour construire le graphique
-    try {
-      const resStages = await api.get("stages/");
-      if (Array.isArray(resStages.data)) {
-        // Lecture directe de "AAAA-MM-JJ" pour éviter les décalages de fuseau horaire
-        dates = resStages.data
-          .filter((stage) => stage.date_debut)
-          .map((stage) => ({
-            year: Number(String(stage.date_debut).slice(0, 4)),
-            month: Number(String(stage.date_debut).slice(5, 7)) - 1,
-          }))
-          .filter((d) => !Number.isNaN(d.year) && d.month >= 0 && d.month < 12);
-      }
-    } catch (err) {
-      console.error("Erreur stages:", err);
-    }
-
-    setStats({ stagiaires: totalStagiaires, encadrants: totalEncadrants, services: totalServices });
-    setStageDates(dates);
-    // Année par défaut : l'année en cours si elle a des stages, sinon la plus récente
-    const thisYear = new Date().getFullYear();
-    if (dates.length && !dates.some((d) => d.year === thisYear)) {
-      setSelectedYear(Math.max(...dates.map((d) => d.year)));
-    }
-    setLoading(false);
-  };
 
   const today = new Date().toLocaleDateString("fr-FR", {
     weekday: "long",
@@ -338,7 +338,7 @@ function Dashboard() {
 
         <div className="card-body">
           {loading ? (
-            <div className="skeleton" style={{ height: 300 }} />
+            <SkeletonChart height={isMobile ? 240 : 300} />
           ) : totalStages === 0 ? (
             <EmptyState
               icon="clipboard"

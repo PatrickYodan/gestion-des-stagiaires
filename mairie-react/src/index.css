@@ -2287,19 +2287,6 @@ a.btn {
 }
 
 /* --- Cartes des services : design et effets --- */
-.services-grid .entity-card {
-  position: relative;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 100% 0%, var(--tone-soft, var(--primary-soft)) 0%, transparent 42%),
-    var(--surface);
-  animation: service-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--i, 0) * 0.05s);
-  transition:
-    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.3s,
-    border-color 0.3s;
-}
 
 @keyframes service-in {
   from {
@@ -2309,125 +2296,16 @@ a.btn {
 }
 
 /* Bande de couleur à gauche, qui s'étire au survol */
-.services-grid .entity-card::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  background: var(--tone, var(--primary));
-  transform: scaleY(0.35);
-  transform-origin: top;
-  border-radius: 0 4px 4px 0;
-  opacity: 0.85;
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-}
 
 /* Grand cercle décoratif dans le coin */
-.services-grid .entity-card::after {
-  content: "";
-  position: absolute;
-  top: -55px;
-  right: -55px;
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  border: 18px solid var(--tone-soft, var(--primary-soft));
-  opacity: 0.55;
-  transform: scale(0.8);
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s;
-  pointer-events: none;
-}
-
-.services-grid .entity-card > * {
-  position: relative;
-  z-index: 1;
-}
-
-.services-grid .entity-card:hover {
-  transform: translateY(-5px);
-  border-color: color-mix(in srgb, var(--tone, var(--primary)) 35%, var(--border));
-  box-shadow:
-    0 16px 32px -16px color-mix(in srgb, var(--tone, var(--primary)) 45%, transparent),
-    0 4px 10px -6px rgba(15, 23, 42, 0.12);
-}
-
-.services-grid .entity-card:hover::before {
-  transform: scaleY(1);
-}
-
-.services-grid .entity-card:hover::after {
-  opacity: 1;
-  transform: scale(1.15) rotate(20deg);
-}
 
 /* Icône : pastille qui se remplit et rebondit */
-.services-grid .entity-icon {
-  width: 46px;
-  height: 46px;
-  border-radius: 13px;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone, var(--primary)) 15%, transparent);
-  transition:
-    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-    background 0.25s,
-    color 0.25s,
-    box-shadow 0.25s;
-}
-
-.services-grid .entity-card:hover .entity-icon {
-  transform: scale(1.08) rotate(-8deg);
-  background: var(--tone, var(--primary));
-  color: #fff;
-  box-shadow: 0 8px 16px -6px color-mix(in srgb, var(--tone, var(--primary)) 60%, transparent);
-}
-
-.services-grid .entity-title {
-  font-size: 1rem;
-  transition: color 0.2s;
-}
-
-.services-grid .entity-card:hover .entity-title {
-  color: var(--tone, var(--primary));
-}
 
 /* Boutons modifier / supprimer : discrets, révélés au survol (toujours visibles au clavier et sur mobile) */
-@media (hover: hover) {
-  .services-grid .entity-card-head .row-actions {
-    opacity: 0;
-    transform: translateX(6px);
-    transition: opacity 0.2s, transform 0.2s;
-  }
-
-  .services-grid .entity-card:hover .row-actions,
-  .services-grid .entity-card:focus-within .row-actions {
-    opacity: 1;
-    transform: none;
-  }
-}
 
 /* Pied de carte */
-.services-grid .entity-meta {
-  border-top-style: dashed;
-}
-
-.services-grid .entity-meta .badge {
-  transition: transform 0.2s, background 0.2s, color 0.2s;
-}
-
-.services-grid .entity-card:hover .entity-meta .badge:not(.badge-blue) {
-  background: var(--tone-soft, var(--primary-soft));
-  color: var(--tone, var(--primary));
-}
-
-.services-grid .entity-meta .badge:hover {
-  transform: translateY(-1px);
-}
 
 /* Pastille « en cours » qui clignote doucement */
-.services-grid .badge-dot::before {
-  animation: service-live 1.8s ease-in-out infinite;
-}
 
 @keyframes service-live {
   0%,
@@ -2439,33 +2317,7 @@ a.btn {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .services-grid .entity-card,
-  .services-grid .badge-dot::before {
-    animation: none;
-  }
-
-  .services-grid .entity-card:hover,
-  .services-grid .entity-card:hover .entity-icon,
-  .services-grid .entity-card:hover::after {
-    transform: none;
-  }
-}
-
 /* --- Cartes des documents : design « fiche » et effets --- */
-.docs-grid .entity-card {
-  position: relative;
-  overflow: hidden;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--tone-soft, var(--primary-soft)) 55%, transparent) 0, transparent 72px),
-    var(--surface);
-  animation: doc-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--i, 0) * 0.05s);
-  transition:
-    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.3s,
-    border-color 0.3s;
-}
 
 @keyframes doc-in {
   from {
@@ -2475,185 +2327,16 @@ a.btn {
 }
 
 /* Liseré de couleur en haut, selon le type de document */
-.docs-grid .entity-card::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 3px;
-  background: var(--tone, var(--primary));
-}
 
 /* Coin de page qui se replie au survol */
-.docs-grid .entity-card::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 0;
-  height: 0;
-  background: linear-gradient(225deg, var(--surface-2) 50%, var(--tone-soft, var(--primary-soft)) 50%);
-  border-bottom-left-radius: 6px;
-  box-shadow: -3px 3px 6px rgba(15, 23, 42, 0.12);
-  transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1), height 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  pointer-events: none;
-  z-index: 2;
-}
-
-.docs-grid .entity-card > * {
-  position: relative;
-  z-index: 1;
-}
-
-.docs-grid .entity-card:hover {
-  transform: translateY(-5px);
-  border-color: color-mix(in srgb, var(--tone, var(--primary)) 35%, var(--border));
-  box-shadow:
-    0 18px 34px -18px color-mix(in srgb, var(--tone, var(--primary)) 50%, transparent),
-    0 4px 10px -6px rgba(15, 23, 42, 0.12);
-}
-
-.docs-grid .entity-card:hover::after {
-  width: 26px;
-  height: 26px;
-}
 
 /* Icône en forme de feuille, avec l'extension du fichier */
-.doc-file {
-  position: relative;
-  flex-shrink: 0;
-  width: 44px;
-  height: 54px;
-  display: grid;
-  place-items: center;
-  padding-bottom: 10px;
-  border-radius: 6px 14px 6px 6px;
-  background: var(--tone-soft, var(--primary-soft));
-  color: var(--tone, var(--primary));
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone, var(--primary)) 18%, transparent);
-  transition:
-    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-    background 0.25s,
-    color 0.25s,
-    box-shadow 0.25s;
-}
 
 /* Petit coin plié de la feuille */
-.doc-file::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 13px;
-  height: 13px;
-  border-radius: 0 12px 0 4px;
-  background: color-mix(in srgb, var(--tone, var(--primary)) 25%, #fff);
-}
-
-.doc-file-ext {
-  position: absolute;
-  left: 50%;
-  bottom: 5px;
-  transform: translateX(-50%);
-  max-width: 40px;
-  overflow: hidden;
-  padding: 0 4px;
-  border-radius: 4px;
-  background: var(--tone, var(--primary));
-  color: #fff;
-  font-size: 0.56rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  line-height: 1.5;
-  white-space: nowrap;
-  transition: background 0.25s, color 0.25s;
-}
-
-.docs-grid .entity-card:hover .doc-file {
-  transform: translateY(-3px) rotate(-5deg);
-  background: var(--tone, var(--primary));
-  color: #fff;
-  box-shadow: 0 10px 18px -8px color-mix(in srgb, var(--tone, var(--primary)) 65%, transparent);
-}
-
-.docs-grid .entity-card:hover .doc-file-ext {
-  background: #fff;
-  color: var(--tone, var(--primary));
-}
-
-.docs-grid .entity-title {
-  transition: color 0.2s;
-}
-
-.docs-grid .entity-card:hover .entity-title {
-  color: var(--tone, var(--primary));
-}
 
 /* Encadré du stage rattaché */
-.doc-stage {
-  padding: 0.6rem 0.75rem;
-  border-radius: 9px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-left: 3px solid color-mix(in srgb, var(--tone, var(--primary)) 55%, transparent);
-  transition: background 0.25s, border-color 0.25s;
-}
-
-.doc-stage-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  margin-bottom: 0.15rem;
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.docs-grid .entity-card:hover .doc-stage {
-  background: var(--surface);
-  border-left-color: var(--tone, var(--primary));
-}
 
 /* Pied de carte */
-.docs-grid .entity-meta {
-  border-top-style: dashed;
-}
-
-.doc-open {
-  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
-}
-
-.doc-open .icon,
-.doc-open svg {
-  transition: transform 0.2s;
-}
-
-.docs-grid .entity-card:hover .doc-open {
-  background: var(--tone, var(--primary));
-  border-color: var(--tone, var(--primary));
-  color: #fff;
-}
-
-.doc-open:hover .icon,
-.doc-open:hover svg {
-  transform: translate(2px, -2px);
-}
-
-.doc-open:active {
-  transform: scale(0.96);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .docs-grid .entity-card {
-    animation: none;
-  }
-
-  .docs-grid .entity-card:hover,
-  .docs-grid .entity-card:hover .doc-file {
-    transform: none;
-  }
-}
 
 /* Nombre de stagiaires encadrés par un tuteur */
 .encadrement {
@@ -2679,33 +2362,6 @@ a.btn {
 }
 
 /* --- Établissements : ligne cliquable et carte de localisation --- */
-.row-clickable {
-  cursor: pointer;
-}
-
-.row-clickable:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: -2px;
-}
-
-.map-link {
-  margin-left: 0.5rem;
-  color: var(--teal);
-  font-weight: 600;
-  opacity: 0;
-  transition: opacity 0.15s;
-}
-
-.row-clickable:hover .map-link,
-.row-clickable:focus-visible .map-link {
-  opacity: 1;
-}
-
-@media (hover: none) {
-  .map-link {
-    opacity: 1;
-  }
-}
 
 .etab-map-modal {
   max-width: 760px;
@@ -2799,14 +2455,6 @@ a.btn {
   color: var(--text-2);
   white-space: pre-line;
   word-break: break-word;
-}
-
-.etab-localisation {
-  display: block;
-  max-width: 260px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .localisation-tools {
@@ -5377,7 +5025,6 @@ textarea.input.chat-input:focus {
     flex-shrink: 0;
   }
 
-
   .chat-thread-actions {
     flex-shrink: 0;
     gap: 0;
@@ -5544,7 +5191,6 @@ textarea.input.chat-input:focus {
 .chat-draft-status.error {
   color: var(--danger);
 }
-
 
 /* --- Bouton son des nouveaux messages : interrupteur en capsule --- */
 .sound-toggle {
@@ -6096,104 +5742,41 @@ textarea.input.chat-input:focus {
     padding: 0.85rem;
   }
 
-  .docs-grid .entity-card {
-    gap: 0.75rem;
-    padding: 1rem;
-  }
+  
 
   /* Pas de soulèvement ni de coin replié au toucher (effets prévus pour la souris) */
-  .docs-grid .entity-card:hover {
-    transform: none;
-  }
+  
 
-  .docs-grid .entity-card:hover::after {
-    width: 0;
-    height: 0;
-  }
+  
 
-  .doc-file {
-    width: 40px;
-    height: 50px;
-  }
+  
 
   /* Titre lisible : taille confortable, 2 lignes maximum */
-  .docs-grid .entity-title {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    font-size: 0.95rem;
-    line-height: 1.35;
-  }
+  
 
-  .docs-grid .entity-card-head .cell-sub {
-    margin-top: 0.2rem;
-    font-size: 0.78rem;
-  }
+  
 
-  .doc-stage {
-    padding: 0.65rem 0.75rem;
-  }
+  
 
-  .doc-stage .cell-title {
-    font-size: 0.88rem !important;
-    line-height: 1.35;
-  }
+  
 
-  .doc-stage .cell-sub {
-    font-size: 0.78rem;
-  }
+  
 
   /* Pied de carte : type à gauche, « Ouvrir » bien visible et facile à toucher */
-  .docs-grid .entity-meta {
-    gap: 0.5rem;
-    padding-top: 0.75rem;
-  }
+  
 
-  .docs-grid .entity-meta .badge {
-    font-size: 0.72rem;
-  }
+  
 
-  .docs-grid .entity-meta .row-actions {
-    gap: 0.4rem;
-  }
+  
 
-  .doc-open,
-  .docs-grid .entity-meta .btn-icon {
-    height: 40px;
-    min-width: 40px;
-  }
+  
 
-  .doc-open {
-    padding: 0 1rem;
-    border-radius: 999px;
-    background: var(--tone, var(--primary));
-    border-color: var(--tone, var(--primary));
-    color: #fff;
-    font-size: 0.85rem;
-  }
+  
 
-  .docs-grid .entity-meta .btn-danger-ghost {
-    border-radius: 50%;
-  }
+  
 }
 
 /* Très petits écrans : badge du type et boutons sur deux lignes si besoin */
-@media (max-width: 360px) {
-  .docs-grid .entity-meta {
-    flex-wrap: wrap;
-  }
-
-  .docs-grid .entity-meta .row-actions {
-    width: 100%;
-    margin-left: 0 !important;
-  }
-
-  .doc-open {
-    flex: 1;
-    justify-content: center;
-  }
-}
 
 /* ==========================================================================
    Fiche de note de stage sur téléphone : lecture confortable à l'écran
@@ -6389,10 +5972,6 @@ textarea.input.chat-input:focus {
     opacity: 0;
     transform: translateY(-6px);
   }
-}
-
-.docs-grid .entity-meta .badge.truncate {
-  max-width: 60%;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -6767,5 +6346,4543 @@ textarea.input.chat-input:focus {
 @media (max-width: 860px) {
   .app-main:has(.messagerie-page) .app-footer {
     display: none;
+  }
+}
+
+/* ==========================================================================
+   Documents & Attestations : cartes « couverture »
+   ========================================================================== */
+.docs-grid {
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.15rem;
+}
+
+.doc-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  animation: doc-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 0.05s);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s, border-color 0.3s;
+}
+
+.doc-card:hover {
+  transform: translateY(-5px);
+  border-color: color-mix(in srgb, var(--doc) 35%, var(--border));
+  box-shadow:
+    0 18px 34px -18px color-mix(in srgb, var(--doc) 55%, transparent),
+    0 4px 10px -6px rgba(15, 23, 42, 0.12);
+}
+
+/* --- Couverture --- */
+.doc-cover {
+  position: relative;
+  height: 92px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 85% -20%, rgba(255, 255, 255, 0.35) 0, transparent 50%),
+    linear-gradient(135deg, var(--doc) 0%, var(--doc-2) 100%);
+}
+
+/* Lignes décoratives façon « page de document » */
+.doc-cover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(0deg, transparent 0 13px, rgba(255, 255, 255, 0.14) 13px 14px);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 60%);
+  pointer-events: none;
+}
+
+/* Grand cercle décoratif */
+.doc-cover::after {
+  content: "";
+  position: absolute;
+  left: -30px;
+  bottom: -46px;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 14px solid rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.doc-card:hover .doc-cover::after {
+  transform: scale(1.25) translate(8px, -6px);
+}
+
+.doc-cover-icon {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--doc);
+  box-shadow: 0 10px 22px -8px rgba(15, 23, 42, 0.35);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s, color 0.25s;
+}
+
+.doc-card:hover .doc-cover-icon {
+  transform: translateY(-3px) rotate(-6deg) scale(1.06);
+  background: var(--doc-ink);
+  color: #fff;
+}
+
+.doc-cover-ext {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--doc);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  backdrop-filter: blur(4px);
+}
+
+/* --- Contenu --- */
+.doc-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.95rem 1.05rem 0.85rem;
+}
+
+.doc-type {
+  align-self: flex-start;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--doc);
+}
+
+.doc-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--text);
+  word-break: break-word;
+  transition: color 0.2s;
+}
+
+.doc-card:hover .doc-title {
+  color: var(--doc);
+}
+
+.doc-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+/* Stagiaire et stage concernés */
+.doc-person {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: auto;
+  padding: 0.6rem 0.65rem;
+  border-radius: 11px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.doc-person-avatar {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--doc-soft);
+  color: var(--doc);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.doc-person-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.doc-person-text strong,
+.doc-person-text span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.doc-person-text strong {
+  font-size: 0.82rem;
+  color: var(--text);
+}
+
+.doc-person-text span {
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+/* --- Actions --- */
+.doc-foot {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.05rem 1rem;
+}
+
+.doc-action {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--doc) 35%, var(--border));
+  background: var(--surface);
+  color: var(--doc);
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.doc-action:hover,
+.doc-card:hover .doc-action:not(.is-disabled) {
+  background: var(--doc);
+  border-color: var(--doc);
+  color: #fff;
+}
+
+.doc-action:active {
+  transform: scale(0.97);
+}
+
+.doc-action:focus-visible,
+.doc-delete:focus-visible {
+  outline: 2px solid var(--doc);
+  outline-offset: 2px;
+}
+
+.doc-action.is-disabled {
+  border-style: dashed;
+  color: var(--subtle);
+  cursor: default;
+}
+
+.doc-delete {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--muted);
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.doc-delete:hover {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+/* --- Téléphone --- */
+@media (max-width: 640px) {
+  .docs-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.85rem;
+  }
+
+  .doc-card:hover {
+    transform: none;
+  }
+
+  /* Couverture en bandeau à gauche pour gagner de la hauteur */
+  .doc-card {
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr);
+    grid-template-rows: 1fr auto;
+  }
+
+  .doc-cover {
+    grid-row: 1 / span 2;
+    height: auto;
+  }
+
+  .doc-cover-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 13px;
+  }
+
+  .doc-cover-ext {
+    top: auto;
+    right: 50%;
+    bottom: 0.6rem;
+    transform: translateX(50%);
+  }
+
+  .doc-body {
+    padding: 0.85rem 0.9rem 0.6rem;
+  }
+
+  .doc-title {
+    font-size: 0.95rem;
+  }
+
+  .doc-foot {
+    padding: 0 0.9rem 0.85rem;
+  }
+
+  .doc-action,
+  .doc-delete {
+    height: 42px;
+  }
+
+  .doc-delete {
+    width: 42px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .doc-card {
+    animation: none;
+  }
+
+  .doc-card:hover,
+  .doc-card:hover .doc-cover-icon {
+    transform: none;
+  }
+}
+
+/* ==========================================================================
+   Documents & Attestations : palette propre à chaque type de document
+   --doc / --doc-2 : dégradé de la couverture · --doc-soft : fonds clairs · --doc-ink : texte
+   ========================================================================== */
+.doc-card {
+  --doc: #6366f1;
+  --doc-2: #4338ca;
+  --doc-soft: #eef2ff;
+  --doc-ink: #3730a3;
+}
+
+/* Convention : indigo */
+.doc-card.doc-conventions {
+  --doc: #6366f1;
+  --doc-2: #4338ca;
+  --doc-soft: #eef2ff;
+  --doc-ink: #3730a3;
+}
+
+/* Attestation : émeraude */
+.doc-card.doc-attestation {
+  --doc: #10b981;
+  --doc-2: #047857;
+  --doc-soft: #ecfdf5;
+  --doc-ink: #065f46;
+}
+
+/* Rapport : ambre / orangé */
+.doc-card.doc-rapport {
+  --doc: #f59e0b;
+  --doc-2: #ea580c;
+  --doc-soft: #fff7ed;
+  --doc-ink: #9a3412;
+}
+
+/* Autre : rose framboise */
+.doc-card.doc-autre {
+  --doc: #ec4899;
+  --doc-2: #be185d;
+  --doc-soft: #fdf2f8;
+  --doc-ink: #9d174d;
+}
+
+/* Textes colorés : teinte foncée pour rester lisibles sur fond blanc */
+.doc-card .doc-type,
+.doc-card:hover .doc-title,
+.doc-card .doc-person-avatar {
+  color: var(--doc-ink);
+}
+
+.doc-card .doc-cover-ext {
+  color: var(--doc-ink);
+}
+
+.doc-card .doc-action {
+  color: var(--doc-ink);
+}
+
+.doc-card .doc-action:hover,
+.doc-card:hover .doc-action:not(.is-disabled) {
+  background: linear-gradient(135deg, var(--doc), var(--doc-2));
+  border-color: var(--doc-2);
+  color: #fff;
+}
+
+.doc-card .doc-person {
+  background: var(--doc-soft);
+  border-color: color-mix(in srgb, var(--doc) 22%, transparent);
+}
+
+.doc-card .doc-person-avatar {
+  background: #fff;
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--doc) 45%, transparent);
+}
+
+/* ==========================================================================
+   Services & Établissements : cartes
+   ========================================================================== */
+.org-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 1.15rem;
+  padding: 1.25rem;
+}
+
+.org-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: hidden;
+  padding: 1.15rem 1.15rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--tone, var(--primary)) 12%, transparent) 0, transparent 40%),
+    var(--surface);
+  box-shadow: var(--shadow-sm);
+  animation: org-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 0.05s);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s, border-color 0.3s;
+}
+
+/* Liseré de couleur en haut */
+.org-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--tone, var(--primary)), color-mix(in srgb, var(--tone, var(--primary)) 45%, #fff));
+}
+
+.org-card:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--tone, var(--primary)) 35%, var(--border));
+  box-shadow:
+    0 18px 32px -18px color-mix(in srgb, var(--tone, var(--primary)) 55%, transparent),
+    0 4px 10px -6px rgba(15, 23, 42, 0.12);
+}
+
+@keyframes org-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+/* --- En-tête --- */
+.org-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.org-icon,
+.org-monogram {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s, color 0.25s;
+}
+
+.org-icon {
+  background: var(--tone-soft, var(--primary-soft));
+  color: var(--tone, var(--primary));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone, var(--primary)) 18%, transparent);
+}
+
+.org-monogram {
+  background: linear-gradient(135deg, var(--tone, var(--primary)), color-mix(in srgb, var(--tone, var(--primary)) 60%, #000));
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  box-shadow: 0 8px 16px -8px color-mix(in srgb, var(--tone, var(--primary)) 70%, transparent);
+}
+
+.org-card:hover .org-icon {
+  transform: rotate(-8deg) scale(1.06);
+  background: var(--tone, var(--primary));
+  color: #fff;
+}
+
+.org-card:hover .org-monogram {
+  transform: rotate(-6deg) scale(1.06);
+}
+
+.org-titles {
+  flex: 1;
+  min-width: 0;
+}
+
+.org-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.org-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.org-city {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0.3rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--tone, var(--primary)) 80%, #000);
+}
+
+/* Boutons modifier / supprimer */
+.org-tools {
+  display: flex;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.org-tool {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--muted);
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.org-tool:hover {
+  border-color: color-mix(in srgb, var(--tone, var(--primary)) 40%, var(--border));
+  color: var(--tone, var(--primary));
+}
+
+.org-tool.danger:hover {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+.org-tool:focus-visible,
+.etab-map-btn:focus-visible {
+  outline: 2px solid var(--tone, var(--primary));
+  outline-offset: 2px;
+}
+
+/* --- Service : chiffres clés --- */
+.org-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.org-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  padding: 0.6rem 0.4rem;
+  border-radius: 11px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.org-stat strong {
+  font-size: 1.25rem;
+  line-height: 1.2;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.org-stat span {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.org-stat.is-live {
+  background: var(--tone-soft, var(--primary-soft));
+  border-color: color-mix(in srgb, var(--tone, var(--primary)) 25%, transparent);
+}
+
+.org-stat.is-live strong {
+  color: var(--tone, var(--primary));
+}
+
+/* Barre d'activité du service */
+.org-activity-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+.org-activity-label strong {
+  color: var(--tone, var(--primary));
+}
+
+.org-activity-track {
+  height: 6px;
+  border-radius: 999px;
+  background: #e8edf5;
+  overflow: hidden;
+}
+
+.org-activity-track span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--tone, var(--primary)) 55%, #fff), var(--tone, var(--primary)));
+  transform-origin: left;
+  animation: share-grow 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
+}
+
+/* --- Établissement --- */
+.etab-loc {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: -0.35rem 0 0;
+  padding: 0.5rem 0.65rem;
+  border-radius: 9px;
+  background: var(--tone-soft, var(--primary-soft));
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+
+.etab-contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.82rem;
+}
+
+.etab-contacts li {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  color: var(--muted);
+}
+
+.etab-contacts a {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-2);
+  text-decoration: none;
+}
+
+.etab-contacts a:hover {
+  color: var(--tone, var(--primary));
+  text-decoration: underline;
+}
+
+.etab-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-top: auto;
+  padding-top: 0.85rem;
+  border-top: 1px dashed var(--border);
+}
+
+.etab-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: var(--tone-soft, var(--primary-soft));
+  color: color-mix(in srgb, var(--tone, var(--primary)) 85%, #000);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.etab-map-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 34px;
+  padding: 0 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--tone, var(--primary)) 35%, var(--border));
+  border-radius: 999px;
+  background: var(--surface);
+  color: color-mix(in srgb, var(--tone, var(--primary)) 85%, #000);
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.etab-map-btn:hover,
+.etab-card:hover .etab-map-btn {
+  background: var(--tone, var(--primary));
+  border-color: var(--tone, var(--primary));
+  color: #fff;
+}
+
+/* --- Téléphone --- */
+@media (max-width: 640px) {
+  .org-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.85rem;
+    padding: 0.85rem;
+  }
+
+  .org-card {
+    padding: 1.05rem 1rem 1rem;
+  }
+
+  .org-card:hover {
+    transform: none;
+  }
+
+  .org-tool {
+    width: 38px;
+    height: 38px;
+  }
+
+  .etab-map-btn {
+    height: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .org-card,
+  .org-activity-track span {
+    animation: none;
+  }
+
+  .org-card:hover,
+  .org-card:hover .org-icon,
+  .org-card:hover .org-monogram {
+    transform: none;
+  }
+}
+
+/* ==========================================================================
+   Tableaux en lignes flottantes (stagiaires, encadrants)
+   --row-accent / --row-accent-2 : couleur de la barre de survol · --row-border : bordure au survol
+   ========================================================================== */
+.float-wrap {
+  padding: 0.35rem 1rem 1rem;
+  background:
+    linear-gradient(180deg, var(--surface) 0, transparent 60px),
+    #f6f8fc;
+}
+
+.float-table {
+  --row-accent: var(--primary);
+  --row-accent-2: #60a5fa;
+  --row-border: #c7d2fe;
+  --row-hover: #fbfcff;
+  --row-shadow: var(--row-shadow);
+  border-collapse: separate;
+  border-spacing: 0 0.6rem;
+}
+
+/* En-tête discret, aligné sur les lignes */
+.float-table thead th {
+  padding-top: 0.6rem;
+  padding-bottom: 0.2rem;
+  border: 0;
+  background: transparent;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--subtle);
+}
+
+.float-table thead th.col-actions {
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Chaque stagiaire : une ligne-carte arrondie */
+.float-table tbody tr {
+  animation: float-row-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 0.035s);
+}
+
+@keyframes float-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.float-table tbody td {
+  padding-top: 0.9rem;
+  padding-bottom: 0.9rem;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.float-table tbody tr:last-child td {
+  border-bottom: 1px solid var(--border);
+}
+
+.float-table tbody td:first-child {
+  position: relative;
+  border-left: 1px solid var(--border);
+  border-radius: 14px 0 0 14px;
+}
+
+.float-table tbody td:last-child {
+  border-right: 1px solid var(--border);
+  border-radius: 0 14px 14px 0;
+}
+
+/* Barre d'accent à gauche, qui apparaît au survol */
+.float-table tbody td:first-child::after {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 14%;
+  bottom: 14%;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(180deg, var(--row-accent-2), var(--row-accent));
+  transform: scaleY(0);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.float-table tbody tr:hover {
+  background: transparent;
+}
+
+.float-table tbody tr:hover td {
+  background: var(--row-hover);
+  border-color: var(--row-border);
+}
+
+.float-table tbody tr:hover td:first-child::after {
+  transform: scaleY(1);
+}
+
+/* Ombre de la ligne survolée (portée par les cellules, une ligne ne peut pas en avoir) */
+.float-table tbody tr:hover td {
+  box-shadow: 0 10px 18px -14px var(--row-shadow);
+}
+
+/* La colonne d'actions reste collée à droite : même fond et coins que la ligne */
+.float-table tbody td.col-actions {
+  box-shadow: -10px 0 10px -10px rgba(15, 23, 42, 0.12);
+}
+
+.float-table tbody tr:hover td.col-actions {
+  background: var(--row-hover);
+}
+
+/* Photo : anneau clair qui se colore au survol */
+.float-table .avatar {
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px #e2e8f0;
+  transition: box-shadow 0.2s;
+}
+
+.float-table tbody tr:hover .avatar {
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--row-accent);
+}
+
+.float-table .person-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.float-table tbody tr:hover .person-name {
+  color: var(--row-accent);
+}
+
+/* Note : pastille plus marquée */
+.float-table td.col-center .badge {
+  min-width: 64px;
+  justify-content: center;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+/* Bouton « Fiche » en capsule */
+.float-table .row-actions .btn-secondary {
+  border-radius: 999px;
+}
+
+.float-table .row-actions .btn-secondary:not(:disabled):hover {
+  background: var(--row-accent);
+  border-color: var(--row-accent);
+  color: #fff;
+}
+
+.float-table .row-actions .btn-icon {
+  border-radius: 50%;
+}
+
+/* Téléphone : les lignes deviennent des cartes (mise en page générale), on garde le style arrondi */
+@media (max-width: 640px) {
+  .float-wrap {
+    padding: 0.75rem;
+  }
+
+  .float-table {
+    border-spacing: 0;
+  }
+
+  .float-table tbody tr {
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .float-table tbody tr:last-child {
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .float-table tbody td,
+  .float-table tbody td:first-child,
+  .float-table tbody td:last-child,
+  .float-table tbody tr:hover td {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .float-table tbody td:first-child::after {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float-table tbody tr {
+    animation: none;
+  }
+}
+
+/* Variante encadrants : accent vert d'eau */
+.float-table.accent-teal {
+  --row-accent: #0f766e;
+  --row-accent-2: #2dd4bf;
+  --row-border: #99f6e4;
+  --row-hover: #f8fffe;
+  --row-shadow: rgba(15, 118, 110, 0.4);
+}
+
+.float-table.accent-teal .encadrement-count {
+  background: #ccfbf1;
+  color: #0f766e;
+}
+
+/* ==========================================================================
+   Gestion des utilisateurs : tableaux
+   ========================================================================== */
+
+/* ==========================================================================
+   Gestion des utilisateurs : liste des comptes (en-tête sombre, couleur par rôle)
+   --role / --role-soft : couleur du rôle de la ligne
+   ========================================================================== */
+.users-wrap {
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.users-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.users-table tr.role-admin { --role: #7c3aed; --role-soft: #f5f3ff; }
+.users-table tr.role-rh { --role: #0d9488; --role-soft: #f0fdfa; }
+.users-table tr.role-tuteur { --role: #2563eb; --role-soft: #eff6ff; }
+
+/* En-tête sombre */
+.users-table thead th {
+  padding-top: 0.85rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 0;
+  background: linear-gradient(135deg, #0b1533 0%, #1e2b5c 100%);
+  color: #c7d2fe;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+}
+
+.users-table thead th.col-actions {
+  background: #16224a;
+  box-shadow: none;
+}
+
+/* Lignes : alternance et liseré de la couleur du rôle */
+.users-table tbody tr {
+  animation: users-row-in 0.35s ease-out both;
+  animation-delay: calc(var(--i, 0) * 0.03s);
+}
+
+@keyframes users-row-in {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+}
+
+.users-table tbody td {
+  padding-top: 0.85rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  transition: background 0.15s;
+}
+
+.users-table tbody tr:nth-child(even) td {
+  background: #fafbfd;
+}
+
+.users-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.users-table tbody td:first-child {
+  box-shadow: inset 4px 0 0 var(--role, var(--primary));
+}
+
+.users-table tbody tr:hover {
+  background: transparent;
+}
+
+.users-table tbody tr:hover td,
+.users-table tbody tr:hover td.col-actions {
+  background: var(--role-soft, #f5f8ff);
+}
+
+.users-table tbody tr:nth-child(even) td.col-actions {
+  background: #fafbfd;
+}
+
+/* Photo : anneau de la couleur du rôle */
+.users-table .avatar {
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px color-mix(in srgb, var(--role, var(--primary)) 55%, transparent);
+}
+
+.users-table .person-name {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.users-table tbody tr:hover .person-name {
+  color: var(--role, var(--primary));
+}
+
+/* Badge du rôle plus affirmé */
+.users-table .cell-stack .badge {
+  padding: 0.25rem 0.65rem;
+  border-radius: 7px;
+  font-weight: 700;
+}
+
+/* Votre compte : mention discrète en fin de ligne */
+.users-table tbody tr.is-self td {
+  background: var(--role-soft, #f5f8ff);
+}
+
+/* Compte inactif : ligne atténuée */
+.users-table tbody tr.is-inactive .person,
+.users-table tbody tr.is-inactive .contact,
+.users-table tbody tr.is-inactive .cell-stack {
+  opacity: 0.55;
+}
+
+.users-table .switch.on .switch-track {
+  background: var(--role, var(--primary));
+}
+
+.users-table .row-actions .btn-icon {
+  border-radius: 9px;
+}
+
+/* Téléphone : cartes (mise en page générale) avec la couleur du rôle */
+@media (max-width: 640px) {
+  .users-wrap {
+    padding: 0.75rem;
+  }
+
+  .users-table {
+    border: 0;
+    border-radius: 0;
+    overflow: visible;
+  }
+
+  .users-table tbody tr {
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--role, var(--primary));
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .users-table tbody tr:last-child {
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .users-table tbody td,
+  .users-table tbody tr:nth-child(even) td,
+  .users-table tbody tr:hover td,
+  .users-table tbody tr.is-self td {
+    background: transparent;
+    box-shadow: none;
+    border-bottom: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .users-table tbody tr {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   Gestion des utilisateurs : matrice des droits d'accès
+   (même langage que la liste des comptes : en-tête sombre, couleur par rôle)
+   ========================================================================== */
+.access-table .role-admin { --role: #7c3aed; --role-soft: #f5f3ff; }
+.access-table .role-rh { --role: #0d9488; --role-soft: #f0fdfa; }
+.access-table .role-tuteur { --role: #2563eb; --role-soft: #eff6ff; }
+
+@media (min-width: 641px) {
+  .access .table-wrap {
+    padding: 1rem 1.25rem 1.25rem;
+  }
+
+  .access-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  /* En-tête sombre */
+  .access-table thead th,
+  .access-table thead th.is-admin {
+    padding-top: 0.95rem;
+    padding-bottom: 0.95rem;
+    border-bottom: 0;
+    background: linear-gradient(135deg, #0b1533 0%, #1e2b5c 100%);
+    color: #c7d2fe;
+  }
+
+  .access-table thead th:first-child {
+    border-right-color: rgba(255, 255, 255, 0.08);
+    vertical-align: middle;
+  }
+
+  /* Rôle : nom en blanc, souligné de sa couleur ; nombre de comptes en pastille */
+  .access-table th.access-role {
+    position: relative;
+  }
+
+  .access-table th.access-role::after {
+    content: "";
+    position: absolute;
+    left: 22%;
+    right: 22%;
+    bottom: 0;
+    height: 3px;
+    border-radius: 3px 3px 0 0;
+    background: var(--role);
+  }
+
+  .access-table th.access-role .access-role-name {
+    color: #fff;
+    font-size: 0.86rem;
+  }
+
+  .access-table th.access-role .access-role-name .icon {
+    color: #c4b5fd;
+  }
+
+  .access-table th.access-role .access-role-count {
+    display: inline-block;
+    margin-top: 0.35rem;
+    padding: 0.12rem 0.55rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--role) 35%, transparent);
+    color: #fff;
+    font-size: 0.7rem;
+  }
+
+  /* Lignes : alternance */
+  .access-table tbody td {
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    transition: background-color 0.15s;
+  }
+
+  .access-table tbody tr:nth-child(even):not(.access-group) td {
+    background: #fafbfd;
+  }
+
+  .access-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  /* Colonne Administrateur (non modifiable) : légère teinte violette */
+  .access-table tbody td.is-admin,
+  .access-table tbody tr:nth-child(even):not(.access-group) td.is-admin {
+    background: #faf8ff;
+  }
+
+  /* Survol : chaque cellule de rôle prend la teinte de son rôle */
+  .access-table tbody tr:not(.access-group):hover td {
+    background: #f8fafc;
+  }
+
+  .access-table tbody tr:not(.access-group):hover td.access-cell {
+    background: var(--role-soft);
+  }
+
+  /* Liseré à gauche de la couleur du module */
+  .access-table tbody tr:not(.access-group) td:first-child {
+    box-shadow: inset 4px 0 0 var(--tone, var(--primary));
+  }
+
+  .access-table td:first-child .entity-icon {
+    border-radius: 11px;
+    transition: background 0.2s, color 0.2s, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .access-table tbody tr:not(.access-group):hover td:first-child .entity-icon {
+    background: var(--tone, var(--primary));
+    color: #fff;
+    transform: scale(1.06);
+  }
+
+  /* Sélecteur de niveau : bordure de la couleur du rôle */
+  .access-table .level-control {
+    padding: 4px;
+    border-radius: 10px;
+    border-color: color-mix(in srgb, var(--role) 25%, var(--border));
+    background: var(--surface);
+  }
+
+  .access-table .level-btn {
+    padding: 0.35rem 0.75rem;
+    border-radius: 7px;
+  }
+
+  .access-table .level-btn:not(.active):hover {
+    background: var(--role-soft);
+    color: var(--role);
+  }
+
+  /* Pastilles verrouillées */
+  .access-table .lock-pill {
+    border: 1px solid transparent;
+  }
+
+  /* Séparateur « Accès fixes » */
+  .access-table tr.access-group td {
+    background: repeating-linear-gradient(-45deg, #f8fafc 0 8px, #f1f5f9 8px 16px);
+    color: #64748b;
+    box-shadow: none;
+  }
+
+  .access-table tr.access-fixed td {
+    background: #fbfcfd;
+  }
+}
+
+/* Téléphone : le nom du rôle et sa pastille prennent la couleur du rôle */
+@media (max-width: 640px) {
+  .access-table td.access-cell .access-cell-role {
+    color: var(--role);
+  }
+
+  .access-table td.access-cell .access-cell-count {
+    background: var(--role-soft);
+    color: var(--role);
+  }
+
+  .access-table tbody tr:not(.access-group):not(.access-fixed) {
+    border-top: 4px solid var(--tone, var(--primary));
+  }
+}
+
+/* Droits d'accès (ordinateur) : nombre de comptes centré sous le nom du rôle, aligné dans toutes les colonnes */
+@media (min-width: 641px) {
+  .access-table th.access-role {
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  .access-table th.access-role .access-role-name {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.35rem;
+    line-height: 1.2;
+  }
+
+  .access-table th.access-role .access-role-count {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    min-width: 78px;
+    height: 22px;
+    margin: 0.45rem auto 0;
+    padding: 0 0.6rem;
+    border: 1px solid color-mix(in srgb, var(--role) 55%, transparent);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+}
+
+/* ==========================================================================
+   Affectations & Stages : tableau coloré selon le statut de chaque stage
+   --st : couleur du statut · --st-soft : fond clair (survol)
+   ========================================================================== */
+.stages-table tr.st-live { --st: #2563eb; --st-soft: #eff6ff; }   /* en cours */
+.stages-table tr.st-info { --st: #60a5fa; --st-soft: #f0f7ff; }   /* en cours, pas encore commencé */
+.stages-table tr.st-wait { --st: #f59e0b; --st-soft: #fffbeb; }   /* en attente */
+.stages-table tr.st-late { --st: #ea580c; --st-soft: #fff7ed; }   /* fin dépassée */
+.stages-table tr.st-done { --st: #16a34a; --st-soft: #f0fdf4; }   /* validé */
+.stages-table tr.st-ended { --st: #94a3b8; --st-soft: #f8fafc; }  /* terminé */
+.stages-table tr.st-cancel { --st: #dc2626; --st-soft: #fef2f2; } /* annulé */
+
+.stages-wrap {
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.stages-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* En-tête clair, souligné d'un dégradé */
+.stages-table thead th {
+  padding-top: 0.9rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 0;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f8ff 100%);
+  box-shadow: inset 0 -2px 0 #dbe4ff;
+  color: #334155;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+}
+
+.stages-table thead th.col-actions {
+  background: #f5f8ff;
+  box-shadow: inset 0 -2px 0 #dbe4ff, -10px 0 10px -10px rgba(15, 23, 42, 0.12);
+}
+
+/* Lignes : rail de la couleur du statut, alternance discrète */
+.stages-table tbody tr {
+  animation: stages-row-in 0.35s ease-out both;
+  animation-delay: calc(var(--i, 0) * 0.03s);
+}
+
+@keyframes stages-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.stages-table tbody td {
+  padding-top: 0.95rem;
+  padding-bottom: 0.95rem;
+  border-bottom: 1px solid #eef1f6;
+  background: var(--surface);
+  transition: background 0.15s;
+}
+
+.stages-table tbody tr:nth-child(even) td {
+  background: #fbfcfe;
+}
+
+.stages-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.stages-table tbody td:first-child {
+  position: relative;
+  padding-left: 1.6rem;
+}
+
+/* Rail coloré + point de statut */
+.stages-table tbody td:first-child::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--st, var(--primary));
+}
+
+.stages-table tbody td:first-child::after {
+  content: "";
+  position: absolute;
+  left: 0.6rem;
+  top: 1.3rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--st, var(--primary));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--st, var(--primary)) 20%, transparent);
+}
+
+/* Stage en cours : le point pulse doucement */
+.stages-table tbody tr.st-live td:first-child::after {
+  animation: stage-head 1.8s ease-out infinite;
+}
+
+.stages-table tbody tr:hover {
+  background: transparent;
+}
+
+.stages-table tbody tr:hover td,
+.stages-table tbody tr:hover td.col-actions {
+  background: var(--st-soft, #f5f8ff);
+}
+
+.stages-table tbody tr:nth-child(even) td.col-actions {
+  background: #fbfcfe;
+}
+
+/* Intitulé du stage : prend la couleur du statut au survol */
+.stages-table .cell-strong {
+  font-size: 0.9rem;
+  transition: color 0.15s;
+}
+
+.stages-table tbody tr:hover .cell-strong {
+  color: color-mix(in srgb, var(--st, var(--primary)) 85%, #000);
+}
+
+/* Photo du stagiaire : anneau de la couleur du statut */
+.stages-table .avatar {
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px color-mix(in srgb, var(--st, var(--primary)) 50%, transparent);
+}
+
+/* Badges statut et note plus affirmés */
+.stages-table td .badge {
+  padding: 0.28rem 0.65rem;
+  font-weight: 700;
+}
+
+.stages-table td.col-center .badge {
+  min-width: 62px;
+  justify-content: center;
+}
+
+/* Stage annulé : ligne atténuée, intitulé barré */
+.stages-table tbody tr.st-cancel .cell-strong {
+  text-decoration: line-through;
+  text-decoration-color: rgba(220, 38, 38, 0.5);
+}
+
+.stages-table tbody tr.st-cancel td:not(.col-actions) > * {
+  opacity: 0.7;
+}
+
+/* Fin dépassée : fond légèrement orangé pour attirer l'attention */
+.stages-table tbody tr.st-late td {
+  background: #fffaf5;
+}
+
+.stages-table .row-actions .btn-icon {
+  border-radius: 9px;
+}
+
+/* Téléphone : cartes (mise en page générale) avec la couleur du statut */
+@media (max-width: 640px) {
+  .stages-wrap {
+    padding: 0.75rem;
+  }
+
+  .stages-table {
+    border: 0;
+    border-radius: 0;
+    overflow: visible;
+  }
+
+  .stages-table tbody tr {
+    position: relative;
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--st, var(--primary));
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .stages-table tbody tr:last-child {
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stages-table tbody td,
+  .stages-table tbody tr:nth-child(even) td,
+  .stages-table tbody tr:hover td,
+  .stages-table tbody tr.st-late td {
+    background: transparent;
+    border-bottom: 0;
+  }
+
+  .stages-table tbody td:first-child {
+    padding-left: 0;
+  }
+
+  .stages-table tbody td:first-child::before,
+  .stages-table tbody td:first-child::after {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stages-table tbody tr,
+  .stages-table tbody tr.st-live td:first-child::after {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   Messagerie : thème « bleu nuit & bleu »
+   (liste des conversations sombre, bulles en dégradé bleu, fond de discussion doux)
+   ========================================================================== */
+.chat {
+  border: 0;
+  box-shadow: 0 18px 40px -24px rgba(11, 21, 51, 0.45), 0 0 0 1px rgba(15, 23, 42, 0.06);
+}
+
+/* --- Liste des conversations : panneau bleu nuit --- */
+.chat-list {
+  background: linear-gradient(180deg, #0b1533 0%, #13214a 100%);
+  border-right: 0;
+}
+
+.chat-list-head {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.chat-folders {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.chat-folder {
+  color: #a9b6dc;
+}
+
+.chat-folder:not(.active):hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.chat-folder.active {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  box-shadow: 0 6px 14px -6px rgba(59, 130, 246, 0.8);
+}
+
+.chat-folder-count {
+  background: rgba(255, 255, 255, 0.14);
+  color: #dbeafe;
+}
+
+.chat-folder.active .chat-folder-count:not(.alert) {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+.chat-list-head .search .icon {
+  color: #7d8bb8;
+}
+
+.chat-list-head .search .input {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+}
+
+.chat-list-head .search .input::placeholder {
+  color: #7d8bb8;
+}
+
+.chat-list-head .search .input:focus {
+  border-color: #60a5fa;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.25);
+}
+
+/* Conversations */
+.chat-item {
+  color: #bfdbfe;
+}
+
+.chat-item-top strong {
+  color: #fff;
+}
+
+.chat-item-top time,
+.chat-item-bottom > .truncate {
+  color: #8f9cc6;
+}
+
+.chat-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.chat-item.active {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.35), rgba(37, 99, 235, 0.15));
+  box-shadow: inset 3px 0 0 #93c5fd;
+}
+
+.chat-item.active .chat-item-top strong {
+  color: #fff;
+}
+
+.chat-item.unread .chat-item-bottom > .truncate {
+  color: #dbeafe;
+}
+
+.chat-item.unread .chat-item-top time {
+  color: #93c5fd;
+}
+
+.chat-item.unread .avatar {
+  box-shadow: 0 0 0 2px #0f1b3f, 0 0 0 4px #60a5fa;
+}
+
+.chat-item .draft-label {
+  color: #fca5a5;
+}
+
+.chat-list .empty-state {
+  color: #8f9cc6;
+}
+
+.chat-list .empty-state h3 {
+  color: #fff;
+}
+
+.chat-list .empty-icon {
+  background: rgba(255, 255, 255, 0.08);
+  color: #93c5fd;
+}
+
+.chat-list .skeleton {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.chat-list-items {
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+/* --- Zone de discussion : fond doux en dégradé + motif --- */
+.chat-thread {
+  background-color: #f4f7fd;
+  background-image:
+    radial-gradient(rgba(59, 130, 246, 0.09) 1px, transparent 1px),
+    linear-gradient(160deg, #f7faff 0%, #ecf2fb 100%);
+  background-size: 20px 20px, 100% 100%;
+}
+
+/* En-tête vitré */
+.chat-thread-head {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(10px);
+  border-bottom-color: rgba(59, 130, 246, 0.12);
+}
+
+.chat-peer-avatar {
+  background: linear-gradient(135deg, #3b82f6, #2563eb 55%, #06b6d4);
+}
+
+/* Séparateurs de journée */
+.chat-day span {
+  border-color: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+/* Bulles */
+.bubble-row.theirs .bubble {
+  border-color: rgba(59, 130, 246, 0.12);
+  box-shadow: 0 4px 12px -8px rgba(30, 58, 138, 0.35);
+}
+
+.bubble-row.mine .bubble {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  box-shadow: 0 6px 16px -8px rgba(59, 130, 246, 0.75);
+}
+
+.bubble-status .icon {
+  color: #1d4ed8;
+}
+
+/* Zone de saisie */
+.chat-composer {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-top-color: rgba(59, 130, 246, 0.12);
+}
+
+.chat-composer-row:focus-within {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.22);
+}
+
+.chat-send {
+  border: 0;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  box-shadow: 0 6px 14px -6px rgba(59, 130, 246, 0.8);
+}
+
+.chat-send:disabled {
+  background: #bfdbfe;
+  box-shadow: none;
+}
+
+/* Écran « Sélectionnez une conversation » */
+.chat-placeholder .empty-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  box-shadow: 0 14px 28px -12px rgba(59, 130, 246, 0.7);
+}
+
+.chat-start .icon {
+  background: linear-gradient(135deg, #dbeafe, #dbeafe);
+  color: #3b82f6;
+}
+
+/* Bouton du son : assorti au thème */
+.sound-toggle.on {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.sound-toggle.on .sound-toggle-icon {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+/* Téléphone : la liste occupe tout l'écran, on garde le panneau sombre jusqu'en bas */
+@media (max-width: 860px) {
+  .chat {
+    box-shadow: none;
+  }
+
+  .chat-list {
+    min-height: 100%;
+  }
+}
+
+/* ==========================================================================
+   FINITION GLOBALE — design épuré et cohérent sur toutes les pages
+   Principes : surfaces plates (aucune ombre sur les cartes ni les icônes),
+   séparation par les bordures et les teintes, mouvements courts et fluides.
+   ========================================================================== */
+
+:root {
+  /* Les ombres « de carte » disparaissent partout où ces variables sont utilisées */
+  --shadow-sm: none;
+  --shadow: none;
+  /* Les fenêtres flottantes (modales, menus) gardent une ombre légère pour se détacher du fond */
+  --shadow-lg: 0 24px 48px -20px rgba(15, 23, 42, 0.28);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --border-hover: #c9d3e6;
+  --focus-ring: 0 0 0 3px rgba(29, 78, 216, 0.22);
+}
+
+::selection {
+  background: #dbeafe;
+  color: #0f172a;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+/* --- 1. Cartes : plates, bordure fine, survol par la bordure (sans ombre) --- */
+.card,
+.stat-card,
+.chart-card,
+.welcome-card,
+.entity-card,
+.org-card,
+.doc-card,
+.chat,
+.chat-start,
+.fiche-sheet,
+.doc-person,
+.org-stat,
+.access-table tbody tr,
+.users-table tbody tr,
+.stages-table tbody tr,
+.float-table tbody tr,
+.month-table tbody tr,
+.access-legend,
+.access-savebar {
+  box-shadow: none !important;
+}
+
+.card,
+.stat-card,
+.org-card,
+.doc-card,
+.entity-card {
+  border: 1px solid var(--border);
+}
+
+.stat-card:hover,
+.org-card:hover,
+.doc-card:hover,
+.entity-card:hover {
+  box-shadow: none !important;
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+}
+
+/* Lignes de tableaux : le survol ne projette plus d'ombre */
+.float-table tbody tr:hover td,
+.float-table tbody td.col-actions,
+.users-table tbody td:first-child,
+.stages-table tbody td:first-child {
+  box-shadow: none;
+}
+
+/* Le liseré coloré des tableaux (rôle, module) est conservé, sous forme de bordure */
+.users-table tbody td:first-child {
+  border-left: 4px solid var(--role, var(--primary));
+}
+
+.access-table tbody tr:not(.access-group) td:first-child {
+  box-shadow: none;
+  border-left: 4px solid var(--tone, var(--primary));
+}
+
+/* Colonne d'actions collée à droite : simple trait au lieu d'une ombre */
+.table td.col-actions,
+.table th.col-actions {
+  box-shadow: none !important;
+  border-left: 1px solid var(--border);
+}
+
+/* --- 2. Icônes et pastilles : aplats sans ombre ni halo --- */
+.stat-icon,
+.entity-icon,
+.org-icon,
+.org-monogram,
+.doc-cover-icon,
+.empty-icon,
+.brand-mark,
+.fiche-logo,
+.feature-icon,
+.sound-toggle-icon,
+.chat-send,
+.chat-folder.active,
+.unread-badge,
+.chat-peer-avatar,
+.welcome-art-ring,
+.chart-metric-label::before,
+.month-dot,
+.level-btn.active,
+.segmented button.active,
+.btn,
+.btn-primary,
+.switch-track,
+.switch-track::after {
+  box-shadow: none !important;
+}
+
+/* Le médaillon de bienvenue garde ses anneaux, dessinés en bordure */
+.welcome-art-ring {
+  border: 10px solid rgba(59, 130, 246, 0.16);
+  background-clip: padding-box;
+}
+
+/* Les icônes s'animent par la couleur, plus par la rotation (rendu plus calme) */
+.stat-card:hover .stat-icon,
+.org-card:hover .org-icon,
+.org-card:hover .org-monogram,
+.doc-card:hover .doc-cover-icon {
+  transform: none;
+}
+
+/* --- 3. Boutons et champs : réactions nettes et homogènes --- */
+.btn {
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.12s var(--ease-out);
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn:focus-visible,
+.chip:focus-visible,
+.input:focus,
+.org-tool:focus-visible,
+.doc-action:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring) !important;
+}
+
+.input {
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.input:hover:not(:focus):not(:disabled) {
+  border-color: var(--border-hover);
+}
+
+.segmented button.active,
+.level-btn.active {
+  outline: 1px solid var(--border);
+}
+
+.chip {
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+/* Badges : forme unique, plus lisible */
+.badge {
+  border-radius: 7px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* --- 4. Transition entre les onglets --- */
+.page-view {
+  animation: page-in 0.35s var(--ease-out) both;
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.stat-card,
+.org-card,
+.doc-card {
+  animation-duration: 0.4s;
+}
+
+/* --- 5. Chargements personnalisés --- */
+
+/* Barre de progression globale (requêtes au serveur) */
+.top-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 1000;
+  height: 3px;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.top-progress.is-visible {
+  opacity: 1;
+}
+
+.top-progress span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -40%;
+  width: 40%;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(90deg, transparent, #3b82f6 30%, #1d4ed8 70%, #06b6d4);
+  animation: top-progress 1.1s var(--ease-out) infinite;
+}
+
+@keyframes top-progress {
+  0% {
+    left: -40%;
+    width: 30%;
+  }
+  60% {
+    width: 45%;
+  }
+  100% {
+    left: 100%;
+    width: 30%;
+  }
+}
+
+/* Écran de chargement de l'application */
+.app-loading {
+  background:
+    radial-gradient(circle at 50% 35%, #eef4ff 0, transparent 55%),
+    var(--bg);
+}
+
+.loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  animation: page-in 0.4s var(--ease-out) both;
+}
+
+.loader-mark {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: #fff;
+}
+
+.loader-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 26px;
+  border: 2px solid transparent;
+  border-top-color: #3b82f6;
+  border-right-color: rgba(59, 130, 246, 0.35);
+  animation: spin 1s linear infinite;
+}
+
+.loader-label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.15rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.loader-dots {
+  display: inline-flex;
+  gap: 3px;
+  margin-left: 2px;
+}
+
+.loader-dots i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: loader-dot 1.2s ease-in-out infinite;
+}
+
+.loader-dots i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.loader-dots i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes loader-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+/* Spinner des boutons : arc fin qui accélère et ralentit */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-right-color: #fff;
+  animation: spin 0.8s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
+}
+
+.spinner-dark {
+  border-color: rgba(29, 78, 216, 0.15);
+  border-top-color: var(--primary);
+  border-right-color: var(--primary);
+}
+
+/* Squelettes : fond doux et reflet qui glisse */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #edf1f7;
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+  animation: skeleton-sweep 1.4s var(--ease-out) infinite;
+}
+
+@keyframes skeleton-sweep {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes skeleton-pulse {
+  50% {
+    background: #e6ebf3;
+  }
+}
+
+/* --- 6. États vides --- */
+.empty-state {
+  padding: 3.25rem 1.5rem 3.5rem;
+}
+
+.empty-icon {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 1.25rem;
+  border-radius: 50%;
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.empty-icon-ring {
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  border: 1.5px dashed #c7d6f5;
+  animation: spin 18s linear infinite;
+}
+
+.empty-state h3 {
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+
+.empty-state p {
+  line-height: 1.55;
+}
+
+/* --- 7. Titres --- */
+.page-title {
+  letter-spacing: -0.02em;
+}
+
+.page-eyebrow {
+  letter-spacing: 0.08em;
+}
+
+/* --- 8. Fenêtres modales : entrée plus douce --- */
+.modal-overlay {
+  backdrop-filter: blur(3px);
+}
+
+.modal {
+  border: 1px solid var(--border);
+  animation: modal-in 0.25s var(--ease-out) both;
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+}
+
+/* --- 9. Mouvements réduits : tout s'arrête proprement --- */
+@media (prefers-reduced-motion: reduce) {
+  .page-view,
+  .loader,
+  .loader-ring,
+  .loader-dots i,
+  .top-progress span,
+  .skeleton,
+  .skeleton::after,
+  .empty-icon-ring,
+  .modal {
+    animation: none;
+  }
+
+  .stat-card:hover,
+  .org-card:hover,
+  .doc-card:hover,
+  .entity-card:hover,
+  .btn:active:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* Compléments : bulles et barres de la messagerie, également sans ombre */
+.bubble,
+.bubble-row.mine .bubble,
+.bubble-row.theirs .bubble,
+.chat-thread-head,
+.chat-composer {
+  box-shadow: none !important;
+}
+
+.bubble-row.theirs .bubble {
+  border: 1px solid #e3e9f5;
+}
+
+/* Tableau des stages : le trait sous l'en-tête de la colonne Actions, dessiné en bordure */
+.stages-table thead th.col-actions {
+  border-bottom: 2px solid #dbe4ff;
+}
+
+/* ==========================================================================
+   REFONTE — palette, typographie et composants (toutes les pages)
+   Palette : bleu royal, fonds bleutés très clairs, gris doux, accents harmonisés.
+   Surfaces plates : aucune ombre sur les cartes ni les icônes.
+   ========================================================================== */
+
+:root {
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+
+  /* Fonds et surfaces */
+  --bg: #f5f7fc;
+  --surface: #ffffff;
+  --surface-2: #f8fafd;
+  --border: #e5e9f2;
+  --border-strong: #d3dae6;
+  --border-hover: #c3cde0;
+
+  /* Textes */
+  --text: #0b1324;
+  --text-2: #2d3a52;
+  --muted: #64708a;
+  --subtle: #98a2b8;
+
+  /* Couleur principale : bleu royal */
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-soft: #eef3ff;
+  --primary-ring: rgba(37, 99, 235, 0.2);
+  --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.2);
+
+  /* Accents harmonisés */
+  --success: #15803d;
+  --success-soft: #e7f8ee;
+  --danger: #e11d48;
+  --danger-hover: #be123c;
+  --danger-soft: #fff1f3;
+  --warning: #b45309;
+  --warning-soft: #fff6e5;
+  --teal: #0f766e;
+  --teal-soft: #e3f7f4;
+  --violet: #6d28d9;
+  --violet-soft: #f1ecff;
+
+  /* Barre latérale claire */
+  --side-bg: #ffffff;
+  --side-bg-2: #ffffff;
+  --side-text: #4a5670;
+  --side-text-strong: #0b1324;
+  --side-border: #e5e9f2;
+
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-feature-settings: "cv11", "ss01";
+  text-rendering: optimizeLegibility;
+}
+
+/* --- Typographie : titres en Plus Jakarta Sans --- */
+.page-title,
+.card-title,
+.topbar-title,
+.welcome-title,
+.modal-title,
+.brand-name,
+.stat-value,
+.chart-metric-value,
+.org-name,
+.doc-title,
+.login-panel h1,
+.login-pitch h2,
+.empty-state h3,
+.fiche-title {
+  font-family: var(--font-display);
+}
+
+.page-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.page-subtitle {
+  color: var(--muted);
+}
+
+/* Sur-titre de page en pastille */
+.page-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.45rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.card-title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.stat-value {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+/* --- Logo --- */
+.logo {
+  display: block;
+  flex-shrink: 0;
+}
+
+.brand-mark {
+  width: auto;
+  height: auto;
+  padding: 0;
+  border-radius: 13px;
+  background: none;
+}
+
+.loader-mark {
+  background: none;
+  border-radius: 20px;
+}
+
+.loader-ring {
+  inset: -9px;
+  border-radius: 28px;
+  border-top-color: var(--primary);
+  border-right-color: rgba(37, 99, 235, 0.3);
+}
+
+.fiche-logo-svg {
+  border-radius: 12px;
+}
+
+/* --- Icônes duotone : aplat léger derrière le trait --- */
+.icon-duo {
+  opacity: 0.16;
+  transition: opacity 0.2s;
+}
+
+.sidebar-link.active .icon-duo,
+.btn-primary .icon-duo {
+  opacity: 0.22;
+}
+
+/* --- Barre latérale claire --- */
+.sidebar {
+  background: var(--side-bg);
+  border-right: 1px solid var(--side-border);
+}
+
+.sidebar-brand {
+  border-bottom: 1px solid var(--side-border);
+}
+
+.brand-name {
+  color: var(--text);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.brand-sub {
+  color: var(--muted);
+}
+
+.sidebar-close {
+  color: var(--muted);
+}
+
+.sidebar-section {
+  color: var(--subtle);
+}
+
+.sidebar-link {
+  border-radius: 10px;
+  color: var(--side-text);
+}
+
+.sidebar-link .icon {
+  color: #7a869f;
+  transition: color 0.15s;
+}
+
+.sidebar-link:hover {
+  background: #f3f6fb;
+  color: var(--text);
+}
+
+.sidebar-link:hover .icon {
+  color: var(--primary);
+}
+
+.sidebar-link.active {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.sidebar-link.active .icon {
+  color: var(--primary);
+}
+
+.sidebar-link.active::before {
+  background: var(--primary);
+}
+
+.sidebar-link:focus-visible {
+  outline-color: var(--primary);
+}
+
+.sidebar-footer {
+  background: var(--surface-2);
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+.sidebar-footer strong {
+  color: var(--text);
+}
+
+/* --- Barre supérieure --- */
+.topbar {
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom-color: var(--border);
+}
+
+.topbar-title {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* --- Cartes --- */
+.card {
+  border-radius: var(--radius-lg);
+  border-color: var(--border);
+}
+
+.card-header {
+  padding-top: 1.35rem;
+}
+
+/* Carte de bienvenue : dégradé bleu royal, motif léger */
+.welcome-card {
+  background:
+    radial-gradient(circle at 88% 15%, rgba(125, 211, 252, 0.35), transparent 42%),
+    radial-gradient(circle at 5% 120%, rgba(147, 197, 253, 0.35), transparent 50%),
+    linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+  border: 0;
+}
+
+.welcome-art-ring {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* --- Boutons --- */
+.btn {
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.btn-secondary {
+  background: var(--surface);
+  border-color: var(--border-strong);
+  color: var(--text-2);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  border-color: var(--border-hover);
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: #f1f4fa;
+}
+
+/* --- Champs --- */
+.input {
+  border-radius: 10px;
+  border-color: var(--border-strong);
+}
+
+.input:focus {
+  border-color: var(--primary);
+}
+
+.label {
+  color: var(--text-2);
+  font-weight: 600;
+}
+
+/* --- Filtres et contrôles segmentés --- */
+.chip {
+  border-radius: 999px;
+}
+
+.chip.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.segmented {
+  border-radius: 11px;
+  background: #f1f4fa;
+}
+
+.segmented button {
+  border-radius: 8px;
+}
+
+.segmented button.active {
+  color: var(--primary);
+  outline-color: var(--border);
+}
+
+/* --- Tableaux : en-têtes homogènes --- */
+.table th {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.table tbody tr:hover {
+  background: #f8faff;
+}
+
+/* --- Badges : couleurs douces de la nouvelle palette --- */
+.badge-blue {
+  background: var(--primary-soft);
+  color: var(--primary-hover);
+}
+
+.badge-success {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.badge-warning {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.badge-danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.badge-teal {
+  background: var(--teal-soft);
+  color: var(--teal);
+}
+
+.badge-violet {
+  background: var(--violet-soft);
+  color: var(--violet);
+}
+
+/* --- Alertes --- */
+.alert {
+  border-radius: 12px;
+}
+
+/* --- Fenêtres modales --- */
+.modal {
+  border-radius: 18px;
+}
+
+.modal-footer {
+  border-radius: 0 0 18px 18px;
+}
+
+/* --- Pied de page --- */
+.app-footer {
+  color: var(--subtle);
+}
+
+/* --- Silhouettes de chargement (composant Skeleton) --- */
+.sk-bone {
+  display: block;
+  flex-shrink: 0;
+}
+
+.sk-lines {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.sk-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.sk-row {
+  display: grid;
+  grid-template-columns: minmax(200px, 2fr) repeat(var(--cols, 3), minmax(0, 1fr)) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  animation: sk-in 0.4s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 0.06s);
+}
+
+.sk-row-main {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-width: 0;
+}
+
+.sk-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.sk-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 1.15rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  animation: sk-in 0.4s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 0.06s);
+}
+
+.sk-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.25rem;
+}
+
+.sk-card-foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.35rem;
+}
+
+/* Graphique : barres qui montent et descendent doucement */
+.sk-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 3%;
+  padding: 1rem 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.sk-bar {
+  flex: 1;
+  height: var(--h);
+  border-radius: 8px 8px 0 0;
+  background: linear-gradient(180deg, #dbe6fb, #edf2fb);
+  transform-origin: bottom;
+  animation: sk-bar 1.6s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 0.09s);
+}
+
+@keyframes sk-bar {
+  0%,
+  100% {
+    transform: scaleY(0.55);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+/* Messagerie : liste et bulles */
+.sk-chatlist {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.4rem;
+}
+
+.sk-chat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.65rem 0.6rem;
+  animation: sk-in 0.4s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 0.06s);
+}
+
+.chat-list .skeleton {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.chat-list .skeleton::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+}
+
+.sk-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem 0.25rem;
+}
+
+.sk-bubble-row {
+  display: flex;
+  animation: sk-in 0.4s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 0.08s);
+}
+
+.sk-bubble-row.mine {
+  justify-content: flex-end;
+}
+
+.sk-bubble-row.mine .skeleton {
+  background: #dbe6fb;
+}
+
+@keyframes sk-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (max-width: 760px) {
+  .sk-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .sk-row .sk-col {
+    display: none;
+  }
+
+  .sk-rows,
+  .sk-cards {
+    padding: 0.85rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sk-row,
+  .sk-card,
+  .sk-chat-item,
+  .sk-bubble-row,
+  .sk-bar {
+    animation: none;
+  }
+}
+
+/* Correctifs constatés à l'écran */
+
+/* Lignes flottantes (stagiaires, encadrants) : marges resserrées pour que tout tienne
+   sans que la colonne Actions, collée à droite, ne recouvre la colonne Note */
+.float-wrap {
+  padding-left: 0.6rem;
+  padding-right: 0.6rem;
+}
+
+.float-table th,
+.float-table td {
+  padding-left: 0.7rem;
+  padding-right: 0.7rem;
+}
+
+.float-table th:first-child,
+.float-table td:first-child {
+  padding-left: 1rem;
+}
+
+.float-table td.col-center .badge {
+  min-width: 0;
+}
+
+.float-table .person {
+  min-width: 190px;
+}
+
+/* En-têtes sombres (utilisateurs, droits d'accès) : aplat uni, sans raccord entre colonnes */
+.users-table thead th,
+.users-table thead th.col-actions {
+  background: #13214a;
+}
+
+@media (min-width: 641px) {
+  .access-table thead th,
+  .access-table thead th.is-admin {
+    background: #13214a;
+  }
+}
+
+/* CORRECTIF : la transition entre onglets n'utilise plus de « transform ».
+   Un transform (même terminé) fait de .page-view le repère des éléments en position fixe :
+   les fenêtres modales s'y retrouvaient enfermées au lieu de couvrir l'écran. Fondu seul. */
+.page-view {
+  animation: page-fade 0.3s ease-out both;
+  transform: none;
+}
+
+@keyframes page-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Écrans de connexion : panneau en dégradé bleu royal, nom lisible en blanc */
+.login-aside {
+  background:
+    radial-gradient(circle at 15% 12%, rgba(125, 211, 252, 0.3), transparent 45%),
+    radial-gradient(circle at 85% 92%, rgba(147, 197, 253, 0.28), transparent 45%),
+    linear-gradient(160deg, #1e3a8a 0%, #2563eb 100%);
+}
+
+.login-aside .brand-name {
+  color: #fff;
+}
+
+.login-aside .brand-sub {
+  color: #bfdbfe;
+}
+
+.login-aside .feature-icon {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+/* Mon compte : bandeau du profil assorti */
+.profile-cover {
+  background:
+    radial-gradient(circle at 85% 20%, rgba(125, 211, 252, 0.4), transparent 45%),
+    linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+}
+
+/* Droits d'accès : chaque ligne de module porte sa couleur (liseré à gauche) */
+.access-table tbody tr[class*="tone-"] td:first-child {
+  border-left-color: var(--tone);
+}
+
+/* ==========================================================================
+   WORKFLOW DE VALIDATION DU STAGE — fenêtre « Suivi du stage », bandeaux, statuts
+   ========================================================================== */
+
+/* Bouton danger (renvoi du dossier) */
+.btn-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: var(--danger-hover);
+  border-color: var(--danger-hover);
+}
+
+/* --- Fenêtre de suivi --- */
+.wf-modal {
+  max-width: 720px;
+}
+
+.wf-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1.1rem;
+  padding: 0.8rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.wf-summary > span:not(.badge) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.wf-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Frise verticale des étapes */
+.wf-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 0.9rem;
+  padding-bottom: 1.35rem;
+}
+
+.wf-step:last-child {
+  padding-bottom: 0.25rem;
+}
+
+/* Trait qui relie les étapes */
+.wf-step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 16px;
+  top: 36px;
+  bottom: 4px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--border);
+}
+
+.wf-step.is-done:not(:last-child)::before {
+  background: #86efac;
+}
+
+.wf-step-marker {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--subtle);
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.wf-step.is-current .wf-step-marker {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.wf-step.is-done .wf-step-marker {
+  border-color: #16a34a;
+  background: #16a34a;
+  color: #fff;
+}
+
+.wf-step-body {
+  min-width: 0;
+  padding-top: 0.2rem;
+}
+
+.wf-step-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.6rem;
+  margin-bottom: 0.65rem;
+}
+
+.wf-step-num {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--subtle);
+}
+
+.wf-step-head h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.wf-step.is-todo .wf-step-head h4 {
+  color: var(--muted);
+}
+
+.wf-chip {
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.wf-chip.done {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.wf-chip.current {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+/* Liste de contrôle des documents */
+.wf-checklist {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.wf-checklist li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px dashed var(--border-strong);
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.wf-checklist li .icon {
+  color: var(--subtle);
+}
+
+.wf-checklist li span {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--warning);
+}
+
+.wf-checklist li.ok {
+  border-style: solid;
+  border-color: #bbf7d0;
+  background: #f4fdf7;
+}
+
+.wf-checklist li.ok .icon,
+.wf-checklist li.ok span {
+  color: var(--success);
+}
+
+/* Documents du dossier */
+.wf-docs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.wf-docs li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  background: var(--surface-2);
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.wf-docs a {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-2);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.wf-docs a:hover {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.wf-doc-type {
+  flex-shrink: 0;
+  padding: 0.1rem 0.45rem;
+  border-radius: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+/* Formulaires d'étape */
+.wf-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+
+.wf-form .field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.wf-form-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 0.6rem;
+}
+
+.wf-form-row-note {
+  grid-template-columns: 140px auto;
+  align-items: end;
+}
+
+.wf-mention {
+  align-self: center;
+  margin-top: 1.3rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  justify-self: start;
+}
+
+.wf-file {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 0.9rem;
+  border: 1.5px dashed var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.84rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.wf-file:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.wf-file input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.wf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.wf-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--warning);
+}
+
+.wf-wait,
+.wf-text,
+.wf-meta {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.wf-wait {
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+
+.wf-meta {
+  font-size: 0.78rem;
+}
+
+/* Résultat de l'évaluation */
+.wf-result {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.wf-note {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.wf-note strong {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.wf-note span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.wf-quote {
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  border-left: 3px solid var(--primary);
+  border-radius: 0 10px 10px 0;
+  background: var(--primary-soft);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--text-2);
+  white-space: pre-line;
+}
+
+.wf-closing {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  background: #f4fdf7;
+}
+
+/* --- Bandeau « À faire » (pages Stagiaires et Stages) --- */
+.wf-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1.25rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid #c7d6f5;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #eef3ff, #f7f9ff);
+  animation: page-fade 0.35s ease-out both;
+}
+
+.wf-banner-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--primary);
+  color: #fff;
+}
+
+.wf-banner > div {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.wf-banner strong {
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+.wf-banner span {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* Pastilles dans le tableau des stagiaires */
+.wf-cell-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.wf-cell-status .badge {
+  padding: 0.12rem 0.5rem;
+  font-size: 0.68rem;
+}
+
+.wf-todo {
+  padding: 0.12rem 0.5rem;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  animation: wf-pulse 2s ease-in-out infinite;
+}
+
+@keyframes wf-pulse {
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* --- Nouveau statut « À valider (RH) » : violet --- */
+.stage-progress.tone-review {
+  --bar-from: #a78bfa;
+  --bar-to: #7c3aed;
+  --bar-text: #6d28d9;
+}
+
+.stages-table tr.st-review {
+  --st: #7c3aed;
+  --st-soft: #f5f3ff;
+}
+
+/* --- Documents : palette de la fiche de notes --- */
+.doc-card.doc-fiche_notes {
+  --doc: #0ea5e9;
+  --doc-2: #1d4ed8;
+  --doc-soft: #eff8ff;
+  --doc-ink: #1e40af;
+}
+
+/* --- Téléphone --- */
+@media (max-width: 640px) {
+  .wf-summary {
+    padding: 0.7rem 1.1rem;
+  }
+
+  .wf-checklist {
+    grid-template-columns: 1fr;
+  }
+
+  .wf-form-row,
+  .wf-form-row-note {
+    grid-template-columns: 1fr;
+  }
+
+  .wf-mention {
+    margin-top: 0;
+  }
+
+  .wf-actions .btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .wf-banner {
+    flex-wrap: wrap;
+  }
+
+  .wf-banner .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wf-todo,
+  .wf-banner {
+    animation: none;
+  }
+}
+
+/* Étape incomplète (documents manquants après l'évaluation) */
+.wf-chip.warn {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.wf-step.is-warn .wf-step-marker {
+  border-color: #f59e0b;
+  background: #fff8eb;
+  color: #b45309;
+}
+
+/* Tableau des stages : sans « overflow: hidden », la colonne Actions peut rester collée à droite */
+.stages-table {
+  overflow: visible;
+}
+
+.stages-table thead th:first-child {
+  border-top-left-radius: 13px;
+}
+
+.stages-table thead th:last-child {
+  border-top-right-radius: 13px;
+}
+
+.stages-table .wf-open {
+  white-space: nowrap;
+}
+
+/* Statut et note réunis dans une même colonne (pages Stages et Stagiaires) */
+.status-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+
+.status-stack-muted {
+  font-size: 0.75rem;
+  color: var(--subtle);
+}
+
+.wf-cell-status .badge:not(.badge-dot) {
+  padding: 0.12rem 0.5rem;
+  font-size: 0.68rem;
+}
+
+/* Réouverture d'un stage terminé (suivi du stage) */
+.wf-reopen-trigger {
+  justify-content: flex-start;
+  margin-top: 0.6rem;
+}
+
+.wf-reopen-trigger .btn {
+  color: var(--muted);
+}
+
+.wf-reopen-trigger .btn:hover:not(:disabled) {
+  color: var(--danger);
+}
+
+.wf-reopen {
+  margin-top: 0.75rem;
+  border-color: #fecdd3;
+  background: #fff8f9;
+}
+
+/* Droits d'accès : niveau plafonné pour un rôle (ex. tuteur en lecture seule sur les stages) */
+.access-cap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.4rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+@media (min-width: 641px) {
+  .access-table td.access-cell .access-cap {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+/* Alerte d'information (bleue) : ex. stage en attente de démarrage dans le suivi */
+.alert-info {
+  border: 1px solid #c7d6f5;
+  background: #f1f6ff;
+  color: #1e3a8a;
+}
+
+.alert-info .icon {
+  color: var(--primary);
+}
+
+.wf-pending {
+  line-height: 1.55;
+}
+
+.wf-pending strong {
+  color: var(--primary-hover);
+}
+
+/* Écran de chargement après connexion : salutation et barre qui se remplit */
+.loader-greeting {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  animation: page-fade 0.5s ease-out 0.1s both;
+}
+
+.loader-progress {
+  width: 180px;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e3e9f5;
+}
+
+.loader-progress span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #60a5fa, var(--primary));
+  transform-origin: left;
+  animation: loader-fill 1.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes loader-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Entrée douce de l'application une fois le chargement terminé */
+.app-shell {
+  animation: page-fade 0.45s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader-greeting,
+  .loader-progress span,
+  .app-shell {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   Connexion : animation « parcours du stage » derrière l'accroche
+   ========================================================================== */
+.login-aside > .journey {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Voile doux derrière le texte : l'animation reste visible sans gêner la lecture */
+.login-pitch {
+  position: relative;
+}
+
+.login-pitch::before {
+  content: "";
+  position: absolute;
+  inset: -2.5rem -3rem -2rem -3rem;
+  z-index: -1;
+  background: radial-gradient(ellipse at 30% 45%, rgba(23, 47, 128, 0.55), transparent 70%);
+  pointer-events: none;
+}
+
+.journey-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Rail : le chemin complet, en pointillés discrets */
+.journey-rail {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 2;
+  stroke-dasharray: 2 9;
+  stroke-linecap: round;
+}
+
+/* Progression : trait lumineux tracé derrière la comète */
+.journey-progress {
+  fill: none;
+  stroke: url(#journey-trace);
+  stroke-width: 3;
+  stroke-linecap: round;
+  animation: journey-trace var(--duree) linear infinite;
+}
+
+@keyframes journey-trace {
+  0% {
+    stroke-dashoffset: var(--longueur);
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+/* Étapes : discrètes, puis elles s'allument quand la comète passe */
+.journey-node-ring {
+  fill: rgba(11, 21, 51, 0.55);
+  stroke: rgba(255, 255, 255, 0.28);
+  stroke-width: 1.5;
+}
+
+.journey-node-core {
+  fill: rgba(255, 255, 255, 0.35);
+}
+
+.journey-node-pulse {
+  fill: none;
+  stroke: #7dd3fc;
+  stroke-width: 2;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.journey-node .journey-node-ring {
+  animation: journey-ring var(--duree) ease-out var(--delai) infinite;
+}
+
+.journey-node .journey-node-core {
+  animation: journey-core var(--duree) ease-out var(--delai) infinite;
+}
+
+.journey-node .journey-node-pulse {
+  animation: journey-pulse var(--duree) ease-out var(--delai) infinite;
+}
+
+@keyframes journey-ring {
+  0% {
+    fill: #2563eb;
+    stroke: #ffffff;
+  }
+  40% {
+    fill: rgba(37, 99, 235, 0.55);
+    stroke: rgba(255, 255, 255, 0.6);
+  }
+  100% {
+    fill: rgba(11, 21, 51, 0.55);
+    stroke: rgba(255, 255, 255, 0.28);
+  }
+}
+
+@keyframes journey-core {
+  0% {
+    fill: #ffffff;
+  }
+  100% {
+    fill: rgba(255, 255, 255, 0.35);
+  }
+}
+
+@keyframes journey-pulse {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.6);
+  }
+  12% {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Étiquettes des étapes */
+.journey-label rect {
+  fill: rgba(255, 255, 255, 0.07);
+  stroke: rgba(255, 255, 255, 0.14);
+}
+
+.journey-label text {
+  fill: rgba(219, 228, 255, 0.55);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.journey-node .journey-label rect {
+  animation: journey-label-bg var(--duree) ease-out var(--delai) infinite;
+}
+
+.journey-node .journey-label text {
+  animation: journey-label-text var(--duree) ease-out var(--delai) infinite;
+}
+
+@keyframes journey-label-bg {
+  0% {
+    fill: rgba(37, 99, 235, 0.85);
+    stroke: rgba(255, 255, 255, 0.5);
+  }
+  45% {
+    fill: rgba(255, 255, 255, 0.1);
+    stroke: rgba(255, 255, 255, 0.2);
+  }
+  100% {
+    fill: rgba(255, 255, 255, 0.07);
+    stroke: rgba(255, 255, 255, 0.14);
+  }
+}
+
+@keyframes journey-label-text {
+  0% {
+    fill: #ffffff;
+  }
+  45% {
+    fill: rgba(219, 228, 255, 0.8);
+  }
+  100% {
+    fill: rgba(219, 228, 255, 0.55);
+  }
+}
+
+/* Cartes « événements » : apparaissent au passage, flottent, puis s'effacent */
+.journey-card {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.85rem 0.6rem 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  opacity: 0;
+  animation: journey-card var(--duree) cubic-bezier(0.22, 1, 0.36, 1) var(--delai) infinite;
+}
+
+.journey-card.c1 {
+  top: 17%;
+  right: 7%;
+}
+
+.journey-card.c2 {
+  top: 47%;
+  right: 4%;
+}
+
+.journey-card.c3 {
+  bottom: 13%;
+  right: 9%;
+}
+
+.journey-card-icon {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: rgba(125, 211, 252, 0.22);
+  color: #bae6fd;
+}
+
+.journey-card-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.journey-card-text strong {
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.journey-card-text small {
+  font-size: 0.7rem;
+  color: #bfdbfe;
+}
+
+@keyframes journey-card {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  6% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  28% {
+    opacity: 1;
+    transform: translateY(-6px);
+  }
+  36%,
+  100% {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+
+/* Écrans moyens : les cartes se rapprochent du bord pour ne pas couvrir le texte */
+@media (max-width: 1180px) {
+  .journey-card.c2 {
+    display: none;
+  }
+}
+
+@media (max-height: 640px) {
+  .journey-card {
+    display: none;
+  }
+}
+
+/* Mouvements réduits : le parcours reste affiché, sans animation */
+@media (prefers-reduced-motion: reduce) {
+  .journey-comet,
+  .journey-card {
+    display: none;
+  }
+
+  .journey-progress,
+  .journey-node *,
+  .journey-label * {
+    animation: none !important;
+  }
+
+  .journey-progress {
+    stroke-dashoffset: 0 !important;
+    opacity: 0.6;
+  }
+}
+
+/* Parcours de connexion : cartes placées dans les zones libres, à l'écart du texte et du chemin */
+.journey-card.c1 {
+  top: auto;
+  bottom: 21%;
+  right: auto;
+  left: 52%;
+}
+
+.journey-card.c2 {
+  top: 47%;
+  right: auto;
+  left: 49%;
+  transform-origin: right center;
+}
+
+.journey-card.c3 {
+  bottom: auto;
+  top: 9%;
+  right: auto;
+  left: 47%;
+}
+
+/* Cartes du parcours : en haut (entre le logo et le titre) et dans le coin bas droit, zones libres */
+.journey-card.c1 {
+  top: auto;
+  left: auto;
+  bottom: 6%;
+  right: 5%;
+}
+
+.journey-card.c2,
+.journey-card.c3 {
+  top: 13%;
+  bottom: auto;
+  left: 38%;
+  right: auto;
+}
+
+/* ==========================================================================
+   Parcours de connexion adaptatif (positions calculées selon la place libre)
+   ========================================================================== */
+.journey-svg {
+  inset: 0 auto auto 0;
+  width: auto;
+  height: auto;
+  overflow: visible;
+}
+
+/* Les cartes sont placées par le script (left / top) dans les zones mesurées libres */
+.journey-card,
+.journey-card.c1,
+.journey-card.c2,
+.journey-card.c3 {
+  right: auto;
+  bottom: auto;
+  display: flex;
+}
+
+/* --- Tablette et téléphone : bandeau compact au-dessus du formulaire --- */
+@media (max-width: 960px) {
+  .login-aside {
+    display: flex;
+    justify-content: flex-start;
+    gap: 1rem;
+    padding: 1.6rem 1.25rem 0.25rem;
+  }
+
+  .login-aside .login-features,
+  .login-aside .login-legal {
+    display: none;
+  }
+
+  .login-pitch h2 {
+    max-width: none;
+    font-size: 1.5rem;
+  }
+
+  .login-pitch p {
+    margin-top: 0.5rem;
+    max-width: none;
+    font-size: 0.88rem;
+  }
+
+  .login-pitch::before {
+    inset: -1rem -1.5rem;
+  }
+
+  /* L'animation a sa propre zone sous l'accroche (vague horizontale) */
+  .login-aside > .journey {
+    position: relative;
+    inset: auto;
+    height: 150px;
+    margin: 0 -1.25rem;
+  }
+
+  /* Le logo est déjà dans le bandeau : pas de doublon dans le formulaire */
+  .login-form .brand-mark {
+    display: none;
+  }
+
+  .login-panel {
+    padding-top: 1.75rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .login-pitch h2 {
+    font-size: 1.3rem;
+  }
+
+  .login-aside > .journey {
+    height: 136px;
+  }
+}
+
+/* Bandeau compact : l'animation vient après le logo et l'accroche, sans espace vide */
+@media (max-width: 960px) {
+  .login {
+    grid-template-rows: auto 1fr;
+    min-height: 100vh;
+  }
+
+  .login-aside > .journey {
+    order: 2;
+  }
+
+  .login-panel {
+    align-content: start;
+  }
+}
+
+@media (max-width: 960px) {
+  .login-panel {
+    place-items: start center;
+  }
+}
+
+/* ==========================================================================
+   Connexion : effets interactifs (halo qui suit la souris, parallaxe, étapes au survol)
+   Variables posées par AuthLayout : --mx / --my (pixels), --px / --py (-1 à 1)
+   ========================================================================== */
+.login-aside {
+  --mx: 30%;
+  --my: 40%;
+  --px: 0;
+  --py: 0;
+}
+
+/* Halo lumineux qui suit la souris */
+.login-aside > .login-spotlight {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(420px circle at var(--mx) var(--my), rgba(147, 197, 253, 0.22), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.login-aside.is-pointer > .login-spotlight {
+  opacity: 1;
+}
+
+/* Particules : trois plans qui suivent la souris à des vitesses différentes */
+.login-aside > .particles {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.particles-plan {
+  position: absolute;
+  inset: -30px;
+  transition: translate 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.particles-plan.plan-1 {
+  translate: calc(var(--px) * -8px) calc(var(--py) * -6px);
+}
+
+.particles-plan.plan-2 {
+  translate: calc(var(--px) * -18px) calc(var(--py) * -14px);
+}
+
+.particles-plan.plan-3 {
+  translate: calc(var(--px) * -32px) calc(var(--py) * -24px);
+}
+
+.particles-plan span {
+  position: absolute;
+  border-radius: 50%;
+  background: #dbeafe;
+  box-shadow: 0 0 6px rgba(191, 219, 254, 0.8);
+  opacity: 0.5;
+  animation-name: particle-drift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.particles-plan.plan-1 span {
+  opacity: 0.3;
+}
+
+.particles-plan.plan-3 span {
+  opacity: 0.7;
+}
+
+@keyframes particle-drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0.25;
+  }
+  25% {
+    opacity: 0.85;
+  }
+  50% {
+    transform: translate(10px, -22px);
+    opacity: 0.45;
+  }
+  75% {
+    opacity: 0.9;
+  }
+}
+
+/* Le parcours et les cartes se décalent légèrement : effet de profondeur */
+.journey-svg {
+  transition: translate 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  translate: calc(var(--px) * -6px) calc(var(--py) * -5px);
+}
+
+.journey-card {
+  transition: translate 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  translate: calc(var(--px) * -16px) calc(var(--py) * -12px);
+}
+
+/* --- Étapes interactives --- */
+.journey-node {
+  pointer-events: auto;
+  cursor: help;
+}
+
+.journey-node-hit {
+  fill: transparent;
+}
+
+.journey-node .journey-node-ring,
+.journey-node .journey-label {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.journey-node.is-hover .journey-node-ring {
+  transform: scale(1.35);
+  fill: #2563eb;
+  stroke: #ffffff;
+  animation: none;
+}
+
+.journey-node.is-hover .journey-node-core {
+  fill: #ffffff;
+  animation: none;
+}
+
+.journey-node.is-hover .journey-label rect {
+  fill: rgba(37, 99, 235, 0.9);
+  stroke: rgba(255, 255, 255, 0.6);
+  animation: none;
+}
+
+.journey-node.is-hover .journey-label text {
+  fill: #ffffff;
+  animation: none;
+}
+
+/* Info-bulle */
+.journey-tip {
+  position: absolute;
+  z-index: 3;
+  width: 240px;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 12px;
+  background: rgba(12, 24, 64, 0.88);
+  backdrop-filter: blur(8px);
+  color: #e0e7ff;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 22px));
+  animation: journey-tip-in 0.2s ease-out both;
+}
+
+.journey-tip strong {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: #ffffff;
+  font-size: 0.8rem;
+}
+
+.journey-tip span {
+  display: block;
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+@keyframes journey-tip-in {
+  from {
+    opacity: 0;
+    margin-top: 6px;
+  }
+}
+
+/* Écrans tactiles et mouvements réduits : pas de halo ni de parallaxe */
+@media (hover: none) {
+  .login-aside > .login-spotlight {
+    display: none;
+  }
+
+  .particles-plan,
+  .journey-svg,
+  .journey-card {
+    translate: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-aside > .login-spotlight,
+  .login-aside > .particles {
+    display: none;
+  }
+
+  .journey-svg,
+  .journey-card {
+    translate: none;
+    transition: none;
+  }
+}
+
+/* Le bloc de l'accroche est transparent mais pleine largeur : il laisse passer la souris
+   jusqu'aux étapes du parcours placées à côté du texte (il ne contient aucun lien) */
+.login-aside > .login-pitch,
+.login-aside > .login-brand {
+  pointer-events: none;
+}
+
+/* Connexion (ordinateur) : l'accroche et les atouts remontent, plus près du logo */
+@media (min-width: 961px) {
+  .login-aside {
+    justify-content: flex-start;
+  }
+
+  .login-aside > .login-pitch {
+    margin-top: clamp(2.5rem, 9vh, 5.5rem);
+  }
+
+  /* La mention de bas de page reste collée en bas du panneau */
+  .login-aside > .login-legal {
+    margin-top: auto;
+  }
+}
+
+/* Info-bulle du parcours : placée par le script dans une zone libre (plus de décalage fixe) */
+.journey-tip {
+  transform: none;
+  visibility: hidden;
+  animation: none;
+}
+
+.journey-tip.is-placed {
+  visibility: visible;
+  animation: journey-tip-in 0.2s ease-out both;
+}
+
+/* ==========================================================================
+   Parcours de connexion — version « produit » : progression étape par étape
+   États d'une étape : à venir (todo) · en cours (current) · terminée (done)
+   ========================================================================== */
+
+/* Rail : chemin complet, fin et discret */
+.jy-rail {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.14);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 1 7;
+}
+
+/* Progression : trait lumineux jusqu'au point, avec une lueur douce */
+.jy-progress {
+  fill: none;
+  stroke: url(#jy-trait);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(147, 197, 253, 0.65));
+}
+
+/* Point qui avance */
+.jy-point {
+  pointer-events: none;
+}
+
+/* --- Étapes --- */
+.jy-node {
+  pointer-events: auto;
+  cursor: help;
+}
+
+.jy-hit {
+  fill: transparent;
+}
+
+.jy-disc {
+  fill: rgba(12, 24, 64, 0.55);
+  stroke: rgba(255, 255, 255, 0.22);
+  stroke-width: 1.25;
+  transition: fill 0.45s ease, stroke 0.45s ease;
+}
+
+.jy-icon {
+  color: rgba(219, 228, 255, 0.55);
+  transition: color 0.45s ease;
+}
+
+.jy-icon svg {
+  display: block;
+  overflow: visible;
+}
+
+.jy-pulse {
+  fill: none;
+  stroke: #bfdbfe;
+  stroke-width: 1.5;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Terminée : pastille bleue pleine et coche blanche */
+.jy-node.is-done .jy-disc {
+  fill: #2563eb;
+  stroke: rgba(255, 255, 255, 0.55);
+}
+
+.jy-node.is-done .jy-icon {
+  color: #ffffff;
+}
+
+/* En cours : pastille blanche, icône bleue, halo qui respire */
+.jy-node.is-current .jy-disc {
+  fill: #ffffff;
+  stroke: #ffffff;
+}
+
+.jy-node.is-current .jy-icon {
+  color: #1d4ed8;
+}
+
+.jy-node.is-current .jy-pulse {
+  animation: jy-pulse 1.4s ease-out infinite;
+}
+
+@keyframes jy-pulse {
+  0% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+
+/* Étiquettes numérotées */
+.jy-label rect {
+  fill: rgba(255, 255, 255, 0.06);
+  stroke: rgba(255, 255, 255, 0.12);
+  transition: fill 0.45s ease, stroke 0.45s ease;
+}
+
+.jy-label text {
+  fill: rgba(219, 228, 255, 0.6);
+  font-family: var(--font);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: fill 0.45s ease;
+}
+
+.jy-label .jy-num {
+  fill: rgba(147, 197, 253, 0.7);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.jy-node.is-done .jy-label text {
+  fill: rgba(255, 255, 255, 0.85);
+}
+
+.jy-node.is-current .jy-label rect {
+  fill: rgba(255, 255, 255, 0.96);
+  stroke: #ffffff;
+}
+
+.jy-node.is-current .jy-label text {
+  fill: #1e3a8a;
+}
+
+.jy-node.is-current .jy-label .jy-num {
+  fill: #2563eb;
+}
+
+/* Survol : l'étape ressort (l'animation est en pause) */
+.jy-node.is-hover .jy-disc {
+  stroke: #ffffff;
+  stroke-width: 2;
+}
+
+.jy-node.is-hover .jy-label rect {
+  stroke: rgba(255, 255, 255, 0.6);
+}
+
+/* --- Carte de l'étape atteinte : une seule visible à la fois --- */
+.jy-card {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 0.9rem 0.6rem 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  color: #ffffff;
+  opacity: 0;
+  transform: translateY(10px) scale(0.97);
+  translate: calc(var(--px, 0) * -16px) calc(var(--py, 0) * -12px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    translate 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.jy-card.is-active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.jy-card-icon {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #2563eb;
+}
+
+.jy-card-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.jy-card-text strong {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.jy-card-text small {
+  font-size: 0.72rem;
+  color: #bfdbfe;
+}
+
+.jy-card-badge {
+  margin-left: 0.35rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: #22c55e;
+  color: #ffffff;
+  font-size: 0.66rem;
+  font-weight: 700;
+  animation: page-fade 0.35s ease-out both;
+}
+
+/* Bandeau compact (téléphone) : étapes un peu plus petites */
+.jy.is-compact .jy-label text {
+  letter-spacing: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jy-node.is-current .jy-pulse {
+    animation: none;
+  }
+
+  .jy-card {
+    transition: none;
+    translate: none;
+  }
+}
+
+.login-panel {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Formulaire de connexion posé sur un panneau blanc arrondi (pas d'ombre) */
+.login-panel > .login-form {
+  padding: 2rem 2rem 1.75rem;
+  border: 1px solid rgba(37, 99, 235, 0.14);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(10px);
+  max-width: 440px;
+}
+
+@media (max-width: 960px) {
+  .login-panel > .login-form {
+    padding: 1.5rem 1.25rem 1.25rem;
+    border-radius: 16px;
   }
 }

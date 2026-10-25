@@ -6,6 +6,7 @@ import EmptyState from "../components/ui/EmptyState";
 import Icon from "../components/ui/Icon";
 import ServiceGlyph from "../components/services/ServiceGlyph";
 import Modal from "../components/ui/Modal";
+import { SkeletonRows } from "../components/ui/Skeleton";
 import {
   apiErrorMessage,
   formatDate,
@@ -15,17 +16,12 @@ import {
   noteBadge,
   NOTE_MAX,
 } from "../utils/format";
+import StageWorkflow from "../components/stages/StageWorkflow";
+import { STATUTS, STATUTS_MANUELS, actionAttendue } from "../utils/workflow";
 
 // Dates courtes dans le tableau (ex. 01/09/2026) pour garder la colonne Période compacte
 const SHORT_DATE = { day: "2-digit", month: "2-digit", year: "numeric" };
 
-const STATUTS = {
-  EN_ATTENTE: { label: "En attente", badge: "badge-warning" },
-  EN_COURS: { label: "En cours", badge: "badge-blue" },
-  VALIDE: { label: "Validé", badge: "badge-success" },
-  TERMINE: { label: "Terminé", badge: "badge-neutral" },
-  ANNULEE: { label: "Annulé", badge: "badge-danger" },
-};
 
 const emptyForm = {
   intitule: "",
@@ -99,9 +95,9 @@ const periodBar = (stage) => {
       if (avantDebut === 0) return { tone: "wait", p: 0, left: "À venir", right: "Débute aujourd'hui" };
       return { tone: "wait", p, left: "Non démarré", right: `Prévu depuis ${jours(-avantDebut)}` };
     case "VALIDE":
-      return { tone: "done", p: 100, left: "Validé", right: duree };
+      return { tone: "review", p: 100, left: "Évalué", right: "En attente RH" };
     case "TERMINE":
-      return { tone: "ended", p: 100, left: "Terminé", right: duree };
+      return { tone: "done", p: 100, left: "Terminé", right: duree };
     case "ANNULEE":
       return { tone: "cancel", p: 100, left: "Annulé", right: duree };
     default:
@@ -110,8 +106,11 @@ const periodBar = (stage) => {
 };
 
 function Stages() {
-  const { can } = useAuth();
-  const canEdit = can("stages", 2); // accès complet : création, modification, suppression
+  const { can, user } = useAuth();
+  // Accès complet : création, modification, suppression (jamais pour un tuteur, qui ne fait que le suivi)
+  const canEdit = can("stages", 2) && user?.role !== "TUTEUR";
+  const estRH = user?.role === "RH" || user?.role === "ADMIN";
+  const [suivi, setSuivi] = useState(null); // stage dont la fenêtre « Suivi » est ouverte
   const [stages, setStages] = useState([]);
   const [stagiaires, setStagiaires] = useState([]);
   const [tuteurs, setTuteurs] = useState([]);
@@ -272,6 +271,24 @@ function Stages() {
         )}
       </div>
 
+      {estRH && stages.some((s) => s.statut === "VALIDE") && (
+        <div className="wf-banner">
+          <span className="wf-banner-icon">
+            <Icon name="shield" size={18} />
+          </span>
+          <div>
+            <strong>
+              {stages.filter((s) => s.statut === "VALIDE").length} dossier
+              {stages.filter((s) => s.statut === "VALIDE").length > 1 ? "s attendent" : " attend"} votre validation
+            </strong>
+            <span>Évalués par leur encadrant : vérifiez puis validez pour clôturer le stage et établir la fiche de notes.</span>
+          </div>
+          <button type="button" className="btn btn-primary btn-sm" onClick={() => setStatutFilter("VALIDE")}>
+            Voir les dossiers
+          </button>
+        </div>
+      )}
+
       {notice && (
         <div className="alert alert-success" role="status">
           <Icon name="check" size={18} />
@@ -328,11 +345,7 @@ function Stages() {
         </div>
 
         {loading ? (
-          <div className="card-body">
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="skeleton" style={{ height: 52, marginBottom: 10 }} />
-            ))}
-          </div>
+          <SkeletonRows rows={5} columns={3} />
         ) : filtered.length === 0 ? (
           <EmptyState
             icon="clipboard"
@@ -350,26 +363,25 @@ function Stages() {
             )}
           </EmptyState>
         ) : (
-          <div className="table-wrap">
-            <table className="table">
+          <div className="table-wrap stages-wrap">
+            <table className="table stages-table">
               <thead>
                 <tr>
                   <th>Stage</th>
                   <th>Stagiaire · Tuteur</th>
                   <th>Période</th>
-                  <th>Statut</th>
-                  <th className="col-center">Note</th>
-                  {canEdit && <th className="col-actions">Actions</th>}
+                  <th>Statut · Note</th>
+                  <th className="col-actions">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((stage) => {
+                {filtered.map((stage, i) => {
                   const stagiaire = byId(stagiaires, stage.stagiaire);
                   const tuteur = byId(tuteurs, stage.tuteur);
                   const statut = STATUTS[stage.statut] || { label: stage.statut, badge: "" };
                   const bar = periodBar(stage);
                   return (
-                    <tr key={stage.id}>
+                    <tr key={stage.id} className={`st-${bar.tone}`} style={{ "--i": Math.min(i, 15) }}>
                       <td>
                         <div className="cell-strong cell-clamp" style={{ minWidth: 180, maxWidth: 250 }} title={stage.intitule}>
                           {stage.intitule}
@@ -425,39 +437,49 @@ function Stages() {
                         </div>
                       </td>
                       <td>
-                        <span className={`badge badge-dot ${statut.badge}`}>{statut.label}</span>
+                        <div className="status-stack">
+                          <span className={`badge badge-dot ${statut.badge}`}>{statut.label}</span>
+                          {isNoted(stage.gratification) ? (
+                            <span className={`badge ${noteBadge(stage.gratification)}`}>
+                              {formatNote(stage.gratification)}
+                            </span>
+                          ) : (
+                            <span className="status-stack-muted">Non notée</span>
+                          )}
+                        </div>
                       </td>
-                      <td className="col-center">
-                        {isNoted(stage.gratification) ? (
-                          <span className={`badge ${noteBadge(stage.gratification)}`}>
-                            {formatNote(stage.gratification)}
-                          </span>
-                        ) : (
-                          <span className="muted">Non notée</span>
-                        )}
+                      <td className="col-actions">
+                        <div className="row-actions">
+                          <button
+                            className={`btn btn-sm wf-open ${actionAttendue(stage, user) ? "btn-primary" : "btn-secondary"}`}
+                            onClick={() => setSuivi(stage)}
+                            title="Suivi du stage : documents, évaluation, validation RH, clôture"
+                          >
+                            <Icon name="clipboard" size={14} />
+                            <span className="btn-label">{actionAttendue(stage, user) || "Suivi"}</span>
+                          </button>
+                          {canEdit && (
+                            <>
+                              <button
+                                className="btn btn-ghost btn-sm btn-icon"
+                                onClick={() => openEdit(stage)}
+                                title="Modifier"
+                                aria-label={`Modifier ${stage.intitule}`}
+                              >
+                                <Icon name="pencil" size={15} />
+                              </button>
+                              <button
+                                className="btn btn-danger-ghost btn-sm btn-icon"
+                                onClick={() => handleDelete(stage)}
+                                title="Supprimer"
+                                aria-label={`Supprimer ${stage.intitule}`}
+                              >
+                                <Icon name="trash" size={15} />
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </td>
-                      {canEdit && (
-                        <td className="col-actions">
-                          <div className="row-actions">
-                            <button
-                              className="btn btn-ghost btn-sm btn-icon"
-                              onClick={() => openEdit(stage)}
-                              title="Modifier"
-                              aria-label={`Modifier ${stage.intitule}`}
-                            >
-                              <Icon name="pencil" size={15} />
-                            </button>
-                            <button
-                              className="btn btn-danger-ghost btn-sm btn-icon"
-                              onClick={() => handleDelete(stage)}
-                              title="Supprimer"
-                              aria-label={`Supprimer ${stage.intitule}`}
-                            >
-                              <Icon name="trash" size={15} />
-                            </button>
-                          </div>
-                        </td>
-                      )}
                     </tr>
                   );
                 })}
@@ -466,6 +488,17 @@ function Stages() {
           </div>
         )}
       </div>
+
+      {suivi && (
+        <StageWorkflow
+          stage={suivi}
+          stagiaire={byId(stagiaires, suivi.stagiaire)}
+          tuteurNom={byId(tuteurs, suivi.tuteur) ? fullName(byId(tuteurs, suivi.tuteur)) : ""}
+          serviceNom={serviceNom(suivi.service)}
+          onClose={() => setSuivi(null)}
+          onUpdated={(next) => setStages((list) => list.map((s) => (s.id === next.id ? next : s)))}
+        />
+      )}
 
       {editing && (
         <Modal
@@ -521,10 +554,13 @@ function Stages() {
             <div className="field">
               <label className="label" htmlFor="statut">Statut</label>
               <select id="statut" name="statut" className="input" value={formData.statut} onChange={handleChange}>
-                {Object.entries(STATUTS).map(([key, s]) => (
-                  <option key={key} value={key}>{s.label}</option>
-                ))}
+                {Object.entries(STATUTS)
+                  .filter(([key]) => STATUTS_MANUELS.includes(key) || key === editing.statut)
+                  .map(([key, s]) => (
+                    <option key={key} value={key}>{s.label}</option>
+                  ))}
               </select>
+              <span className="field-hint">« À valider (RH) » et « Terminé » sont attribués par le suivi du stage.</span>
             </div>
 
             <div className="field">

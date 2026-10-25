@@ -141,10 +141,38 @@ class StagiaireSerializer(serializers.ModelSerializer):
 
 
 class StageSerializer(serializers.ModelSerializer):
+  # Noms affichés dans le suivi du workflow
+  evalue_par_nom = serializers.SerializerMethodField()
+  valide_rh_par_nom = serializers.SerializerMethodField()
 
   class Meta:
     model = Stage
     fields = '__all__'
+    # Ces informations ne sont renseignées que par les actions du workflow (valider, renvoyer)
+    read_only_fields = ['appreciation', 'evalue_le', 'evalue_par', 'valide_rh_le', 'valide_rh_par', 'motif_retour']
+
+  @staticmethod
+  def _nom(user):
+    return f'{user.prenom} {user.nom}'.strip() or user.email if user else None
+
+  def get_evalue_par_nom(self, obj):
+    return self._nom(obj.evalue_par)
+
+  def get_valide_rh_par_nom(self, obj):
+    return self._nom(obj.valide_rh_par)
+
+  # « Validé par l'encadrant » et « Terminé » ne s'obtiennent que par le workflow de validation
+  def validate_statut(self, value):
+    actuel = self.instance.statut if self.instance else None
+    if actuel == 'TERMINE' and value != 'TERMINE':
+      raise serializers.ValidationError(
+        "Ce stage est terminé : utilisez « Rouvrir le stage » dans son suivi (la fiche de notes sera réinitialisée)."
+      )
+    if value in ('VALIDE', 'TERMINE') and value != actuel:
+      raise serializers.ValidationError(
+        "Ce statut est attribué par le workflow : évaluation de l'encadrant, puis validation de l'agent RH."
+      )
+    return value
 
   # Le champ « gratification » contient la note de stage, sur 20
   def validate_gratification(self, value):

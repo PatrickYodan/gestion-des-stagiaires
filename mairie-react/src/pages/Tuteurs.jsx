@@ -8,6 +8,7 @@ import ServiceGlyph from "../components/services/ServiceGlyph";
 import UserFormModal from "../components/utilisateurs/UserFormModal";
 import InvitationNotice from "../components/utilisateurs/InvitationNotice";
 import { apiErrorMessage, fullName } from "../utils/format";
+import { SkeletonRows } from "../components/ui/Skeleton";
 
 function Tuteurs() {
   const { can } = useAuth();
@@ -179,11 +180,7 @@ Un mot de passe provisoire sera envoyé à ${t.email} et devra être changé à 
         </div>
 
         {loading ? (
-          <div className="card-body">
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="skeleton" style={{ height: 44, marginBottom: 10 }} />
-            ))}
-          </div>
+          <SkeletonRows rows={5} columns={3} />
         ) : filtered.length === 0 ? (
           <EmptyState
             icon="userCheck"
@@ -205,8 +202,8 @@ Un mot de passe provisoire sera envoyé à ${t.email} et devra être changé à 
             )}
           </EmptyState>
         ) : (
-          <div className="table-wrap">
-            <table className="table">
+          <div className="table-wrap float-wrap">
+            <table className="table float-table accent-teal">
               <thead>
                 <tr>
                   <th>Tuteur</th>
@@ -217,11 +214,11 @@ Un mot de passe provisoire sera envoyé à ${t.email} et devra être changé à 
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((tuteur) => {
+                {filtered.map((tuteur, i) => {
                   const { total, stagiaires, stagiairesEnCours } = encadrements(tuteur.id);
                   const actif = tuteur.statut_compte === "ACTIF";
                   return (
-                    <tr key={tuteur.id}>
+                    <tr key={tuteur.id} style={{ "--i": Math.min(i, 15) }}>
                       <td>
                         <div className="person">
                           <Avatar

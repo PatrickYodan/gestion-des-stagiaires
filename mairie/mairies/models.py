@@ -127,12 +127,14 @@ class Stagiaire(models.Model):
 
 
 class Stage(models.Model):
+    # Workflow : EN_ATTENTE -> EN_COURS -> VALIDE (évalué par l'encadrant, en attente de l'agent RH)
+    #            -> TERMINE (validé par l'agent RH, fiche de notes établie). ANNULEE à tout moment.
     STATUT_CHOICES = [
-        ('EN_ATTENTE', 'En attente de validation'),
+        ('EN_ATTENTE', 'En attente'),
         ('EN_COURS', 'En cours'),
         ('TERMINE', 'Terminé'),
         ('ANNULEE', 'Annulé'),
-        ('VALIDE', 'Validé'),
+        ('VALIDE', "Validé par l'encadrant"),
     ]
 
     intitule = models.CharField(
@@ -163,6 +165,19 @@ class Stage(models.Model):
         Service, on_delete=models.CASCADE, related_name='stages'
     )
 
+    # --- Suivi du workflow de validation ---
+    appreciation = models.TextField(blank=True, default='', verbose_name="Appréciation de l'encadrant")
+    evalue_le = models.DateTimeField(null=True, blank=True, verbose_name="Évalué par l'encadrant le")
+    evalue_par = models.ForeignKey(
+        Utilisateur, on_delete=models.SET_NULL, null=True, blank=True, related_name='stages_evalues'
+    )
+    valide_rh_le = models.DateTimeField(null=True, blank=True, verbose_name="Validé par l'agent RH le")
+    valide_rh_par = models.ForeignKey(
+        Utilisateur, on_delete=models.SET_NULL, null=True, blank=True, related_name='stages_valides_rh'
+    )
+    # Dernier motif de renvoi à l'encadrant (vidé à la nouvelle évaluation)
+    motif_retour = models.TextField(blank=True, default='')
+
     def __str__(self):
         return f'{self.intitule} - {self.stagiaire.prenom} {self.stagiaire.nom}'
 
@@ -172,6 +187,7 @@ class Document(models.Model):
         ('CONVENTIONS', 'Convention de stage'),
         ('ATTESTATION', 'Attestation de présence'),
         ('RAPPORT', 'Rapport de stage'),
+        ('FICHE_NOTES', 'Fiche de notes'),
         ('AUTRE', 'Autre document'),
     ]
 

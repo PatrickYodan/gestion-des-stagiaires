@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import Icon from "../components/ui/Icon";
 import { apiErrorMessage } from "../utils/format";
 import { passwordScore, scoreLabels } from "../utils/password";
+import Logo from "../components/ui/Logo";
 
 // Écran affiché à la première connexion d'un compte créé avec un mot de passe provisoire :
 // l'utilisateur renseigne son identité et choisit son propre mot de passe avant d'accéder à l'application.
@@ -62,7 +63,7 @@ function PremiereConnexion() {
       <aside className="login-aside">
         <div className="login-brand">
           <div className="brand-mark">
-            <Icon name="landmark" size={20} />
+            <Logo size={40} />
           </div>
           <div>
             <div className="brand-name">Gestion des Stagiaires</div>
@@ -98,7 +99,7 @@ function PremiereConnexion() {
       <main className="login-panel">
         <form onSubmit={handleSubmit} className="login-form" style={{ maxWidth: 420 }}>
           <div className="brand-mark">
-            <Icon name="landmark" size={20} />
+            <Logo size={40} />
           </div>
 
           <div>

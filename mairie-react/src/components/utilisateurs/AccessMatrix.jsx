@@ -3,6 +3,7 @@ import api from "../../api/axios";
 import { useAuth } from "../../context/AuthContext";
 import Icon from "../ui/Icon";
 import { apiErrorMessage } from "../../utils/format";
+import { SkeletonRows } from "../ui/Skeleton";
 
 const LEVELS = [
   { value: 0, label: "Aucun", hint: "Onglet masqué" },
@@ -13,12 +14,12 @@ const LEVELS = [
 const ROLE_LABELS = { ADMIN: "Administrateur", RH: "Agent RH", TUTEUR: "Tuteur" };
 
 const MODULE_INFO = {
-  dashboard: { icon: "dashboard", desc: "Statistiques et graphique des stages" },
-  stagiaires: { icon: "graduation", desc: "Liste, ajout et suppression des stagiaires" },
-  tuteurs: { icon: "userCheck", desc: "Liste, ajout et modification des comptes tuteurs" },
-  stages: { icon: "clipboard", desc: "Affectations, périodes, notes et statuts" },
-  services: { icon: "building", desc: "Services municipaux et établissements" },
-  documents: { icon: "folder", desc: "Conventions, attestations et rapports" },
+  dashboard: { icon: "dashboard", tone: "tone-blue", desc: "Statistiques et graphique des stages" },
+  stagiaires: { icon: "graduation", tone: "tone-orange", desc: "Liste, ajout et suppression des stagiaires" },
+  tuteurs: { icon: "userCheck", tone: "tone-green", desc: "Liste, ajout et modification des comptes tuteurs" },
+  stages: { icon: "clipboard", tone: "tone-rose", desc: "Affectations, périodes, notes et statuts" },
+  services: { icon: "building", tone: "tone-cyan", desc: "Services municipaux et établissements" },
+  documents: { icon: "folder", tone: "tone-amber", desc: "Conventions, attestations et rapports" },
 };
 
 const clone = (m) => JSON.parse(JSON.stringify(m || {}));
@@ -47,11 +48,7 @@ function AccessMatrix({ userCounts = {} }) {
 
   if (loading) {
     return (
-      <div className="card-body">
-        {[0, 1, 2, 3, 4].map((i) => (
-          <div key={i} className="skeleton" style={{ height: 52, marginBottom: 10 }} />
-        ))}
-      </div>
+      <SkeletonRows rows={6} columns={3} />
     );
   }
 
@@ -151,7 +148,7 @@ function AccessMatrix({ userCounts = {} }) {
             <tr>
               <th>Module</th>
               {config.roles.map((role) => (
-                <th key={role} className={`access-role ${role === "ADMIN" ? "is-admin" : ""}`}>
+                <th key={role} className={`access-role role-${role.toLowerCase()} ${role === "ADMIN" ? "is-admin" : ""}`}>
                   <div className="access-role-name">
                     {role === "ADMIN" && <Icon name="lock" size={12} />}
                     {ROLE_LABELS[role] || role}
@@ -166,10 +163,10 @@ function AccessMatrix({ userCounts = {} }) {
               const info = MODULE_INFO[m.id] || { icon: "folder", desc: "" };
               const levels = m.lecture_seule ? LEVELS.slice(0, 2) : LEVELS;
               return (
-                <tr key={m.id}>
+                <tr key={m.id} className={info.tone || ""}>
                   <td>
                     <div className="person">
-                      <div className="entity-icon" style={{ width: 36, height: 36 }}>
+                      <div className={`entity-icon ${info.tone || ""}`} style={{ width: 36, height: 36 }}>
                         <Icon name={info.icon} size={17} />
                       </div>
                       <div>
@@ -183,7 +180,7 @@ function AccessMatrix({ userCounts = {} }) {
                   </td>
                   {config.roles.map((role) =>
                     role === "ADMIN" ? (
-                      <td key={role} className="access-cell is-admin" data-label={ROLE_LABELS[role]}>
+                      <td key={role} className={`access-cell is-admin role-${role.toLowerCase()}`} data-label={ROLE_LABELS[role]}>
                         {roleTag(role)}
                         <span
                           className={`lock-pill ${m.lecture_seule ? "level-1" : "level-2"}`}
@@ -193,7 +190,7 @@ function AccessMatrix({ userCounts = {} }) {
                         </span>
                       </td>
                     ) : (
-                      <td key={role} className="access-cell" data-label={ROLE_LABELS[role] || role}>
+                      <td key={role} className={`access-cell role-${role.toLowerCase()}`} data-label={ROLE_LABELS[role] || role}>
                         {roleTag(role)}
                         <div
                           className={`level-control ${
@@ -202,7 +199,9 @@ function AccessMatrix({ userCounts = {} }) {
                           role="radiogroup"
                           aria-label={`${m.label} — ${ROLE_LABELS[role]}`}
                         >
-                          {levels.map((l) => (
+                          {levels
+                            .filter((l) => l.value <= (config.plafonds?.[role]?.[m.id] ?? 2))
+                            .map((l) => (
                             <button
                               key={l.value}
                               type="button"
@@ -218,6 +217,11 @@ function AccessMatrix({ userCounts = {} }) {
                             </button>
                           ))}
                         </div>
+                        {(config.plafonds?.[role]?.[m.id] ?? 2) < (m.lecture_seule ? 1 : 2) && (
+                          <span className="access-cap" title="Restriction appliquée par le serveur, quelle que soit la configuration">
+                            <Icon name="lock" size={11} /> Consultation et suivi uniquement
+                          </span>
+                        )}
                       </td>
                     ),
                   )}
@@ -244,7 +248,7 @@ function AccessMatrix({ userCounts = {} }) {
                 </div>
               </td>
               {config.roles.map((role) => (
-                <td key={role} className="access-cell" data-label={ROLE_LABELS[role] || role}>
+                <td key={role} className={`access-cell role-${role.toLowerCase()}`} data-label={ROLE_LABELS[role] || role}>
                   {roleTag(role)}
                   <span className={`lock-pill ${role === "ADMIN" ? "level-2" : "level-0"}`}>
                     <Icon name="lock" size={12} /> {role === "ADMIN" ? "Complet" : "Aucun"}
@@ -265,7 +269,7 @@ function AccessMatrix({ userCounts = {} }) {
                 </div>
               </td>
               {config.roles.map((role) => (
-                <td key={role} className="access-cell" data-label={ROLE_LABELS[role] || role}>
+                <td key={role} className={`access-cell role-${role.toLowerCase()}`} data-label={ROLE_LABELS[role] || role}>
                   {roleTag(role)}
                   <span className="lock-pill level-2">
                     <Icon name="lock" size={12} /> Complet

@@ -8,6 +8,9 @@ import Icon from "../components/ui/Icon";
 import ServiceGlyph from "../components/services/ServiceGlyph";
 import Modal from "../components/ui/Modal";
 import { apiErrorMessage, formatNote, fullName, isNoted, noteBadge } from "../utils/format";
+import { SkeletonRows } from "../components/ui/Skeleton";
+import StageWorkflow from "../components/stages/StageWorkflow";
+import { STATUTS, actionAttendue } from "../utils/workflow";
 
 const emptyForm = {
   nom: "",
@@ -40,6 +43,8 @@ function Stagiaires() {
 
   // Stagiaire dont la fiche de note est affichée
   const [fiche, setFiche] = useState(null);
+  // Stage dont la fenêtre « Suivi » (documents, évaluation, validation RH) est ouverte
+  const [suivi, setSuivi] = useState(null);
 
   // Stagiaires, établissements, et données utiles à la fiche de note (stages, services, tuteurs)
   const loadData = () =>
@@ -154,10 +159,14 @@ function Stagiaires() {
       .sort((a, b) => String(b.date_debut).localeCompare(String(a.date_debut)));
 
   // Accès complet au module : ajout, modification et suppression de stagiaires
-  const isGestionnaire = can("stagiaires", 2);
+  // Un tuteur consulte ses stagiaires mais ne peut ni les ajouter, ni les modifier, ni les supprimer
+  const isGestionnaire = can("stagiaires", 2) && user?.role !== "TUTEUR";
   // Encadrant : l'API ne renvoie que les stagiaires dont il est le tuteur
   const isTuteur = user?.role === "TUTEUR";
   const isEdit = Boolean(editing?.item);
+
+  // Stages qui attendent une action de l'utilisateur connecté
+  const aFaire = stages.filter((st) => actionAttendue(st, user));
 
   const query = search.trim().toLowerCase();
   const filtered = stagiaires.filter((s) =>
@@ -196,6 +205,27 @@ function Stagiaires() {
         </div>
       )}
 
+      {aFaire.length > 0 && (
+        <div className="wf-banner">
+          <span className="wf-banner-icon">
+            <Icon name={isTuteur ? "pencil" : "shield"} size={18} />
+          </span>
+          <div>
+            <strong>
+              {aFaire.length} stage{aFaire.length > 1 ? "s" : ""} {isTuteur ? "à évaluer" : "à valider"}
+            </strong>
+            <span>
+              {isTuteur
+                ? "Ajoutez les documents du dossier, puis notez et validez le stage : il sera transmis aux RH."
+                : "Évalués par leur encadrant : validez pour clôturer le stage et établir la fiche de notes."}
+            </span>
+          </div>
+          <button type="button" className="btn btn-primary btn-sm" onClick={() => setSuivi(aFaire[0])}>
+            Commencer
+          </button>
+        </div>
+      )}
+
       <div className="card">
         <div className="toolbar">
           <div className="toolbar-count">
@@ -214,11 +244,7 @@ function Stagiaires() {
         </div>
 
         {loading ? (
-          <div className="card-body">
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="skeleton" style={{ height: 44, marginBottom: 10 }} />
-            ))}
-          </div>
+          <SkeletonRows rows={5} columns={3} />
         ) : filtered.length === 0 ? (
           <EmptyState
             icon="graduation"
@@ -242,23 +268,22 @@ function Stagiaires() {
             )}
           </EmptyState>
         ) : (
-          <div className="table-wrap">
-            <table className="table">
+          <div className="table-wrap float-wrap">
+            <table className="table float-table">
               <thead>
                 <tr>
                   <th>Stagiaire</th>
                   <th>Établissement</th>
-                  <th>Stage</th>
-                  <th className="col-center">Note</th>
+                  <th>Stage · Note</th>
                   <th className="col-actions">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((item) => {
+                {filtered.map((item, i) => {
                   const own = stagesOf(item.id);
                   const last = own[0];
                   return (
-                    <tr key={item.id}>
+                    <tr key={item.id} style={{ "--i": Math.min(i, 15) }}>
                       <td>
                         <div className="person">
                           <Avatar src={item.photo} prenom={item.prenom} nom={item.nom} />
@@ -302,31 +327,47 @@ function Stagiaires() {
                               {serviceNom(last.service)}
                               {own.length > 1 && ` · +${own.length - 1} autre${own.length > 2 ? "s" : ""}`}
                             </div>
+                            <div className="wf-cell-status">
+                              <span className={`badge badge-dot ${(STATUTS[last.statut] || {}).badge || ""}`}>
+                                {(STATUTS[last.statut] || {}).label || last.statut}
+                              </span>
+                              {isNoted(last.gratification) && (
+                                <span className={`badge ${noteBadge(last.gratification)}`}>
+                                  {formatNote(last.gratification)}
+                                </span>
+                              )}
+                              {actionAttendue(last, user) && (
+                                <span className="wf-todo">{actionAttendue(last, user)}</span>
+                              )}
+                            </div>
                           </>
                         ) : (
                           <span className="muted">Aucun stage</span>
                         )}
                       </td>
-                      <td className="col-center">
-                        {last && isNoted(last.gratification) ? (
-                          <span className={`badge ${noteBadge(last.gratification)}`}>
-                            {formatNote(last.gratification)}
-                          </span>
-                        ) : (
-                          <span className="muted">{last ? "Non notée" : "—"}</span>
-                        )}
-                      </td>
                       <td className="col-actions">
                         <div className="row-actions">
-                          <button
-                            onClick={() => setFiche(item)}
-                            className="btn btn-secondary btn-sm"
-                            title={last ? "Afficher et imprimer la fiche de note de stage" : "Aucun stage enregistré"}
-                            disabled={!last}
-                          >
-                            <Icon name="fileText" size={14} />
-                            <span className="btn-label">Fiche</span>
-                          </button>
+                          {last && (
+                            <button
+                              onClick={() => setSuivi(last)}
+                              className={`btn btn-sm ${actionAttendue(last, user) ? "btn-primary" : "btn-secondary"}`}
+                              title="Suivi du stage : documents, évaluation, validation RH, clôture"
+                            >
+                              <Icon name="clipboard" size={14} />
+                              <span className="btn-label">Suivi</span>
+                            </button>
+                          )}
+                          {/* La fiche de notes n'existe qu'une fois toutes les validations faites (stage terminé) */}
+                          {own.some((st) => st.statut === "TERMINE") && (
+                            <button
+                              onClick={() => setFiche(item)}
+                              className="btn btn-secondary btn-sm"
+                              title="Afficher et imprimer la fiche de notes de stage"
+                            >
+                              <Icon name="fileText" size={14} />
+                              <span className="btn-label">Fiche</span>
+                            </button>
+                          )}
                           {isGestionnaire && (
                             <>
                               <button
@@ -434,11 +475,22 @@ function Stagiaires() {
         </Modal>
       )}
 
+      {suivi && (
+        <StageWorkflow
+          stage={suivi}
+          stagiaire={stagiaires.find((x) => x.id === suivi.stagiaire)}
+          tuteurNom={fullName(utilisateurs.find((u) => u.id === suivi.tuteur)) || ""}
+          serviceNom={serviceNom(suivi.service)}
+          onClose={() => setSuivi(null)}
+          onUpdated={(next) => setStages((list) => list.map((x) => (x.id === next.id ? next : x)))}
+        />
+      )}
+
       {/* Fiche de note de stage imprimable */}
       {fiche && (
         <FicheNoteStage
           stagiaire={fiche}
-          stages={stagesOf(fiche.id)}
+          stages={stagesOf(fiche.id).filter((st) => st.statut === "TERMINE")}
           services={services}
           utilisateurs={utilisateurs}
           etablissements={etablissements}

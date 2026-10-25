@@ -5,13 +5,24 @@ import EmptyState from "../components/ui/EmptyState";
 import Icon from "../components/ui/Icon";
 import Modal from "../components/ui/Modal";
 import { apiErrorMessage, formatDate, fullName } from "../utils/format";
+import { SkeletonCards } from "../components/ui/Skeleton";
 
 const TYPES = {
-  CONVENTIONS: { label: "Convention de stage", short: "Conventions", tone: "tone-blue", badge: "badge-blue" },
-  ATTESTATION: { label: "Attestation de présence", short: "Attestations", tone: "tone-teal", badge: "badge-teal" },
-  RAPPORT: { label: "Rapport de stage", short: "Rapports", tone: "tone-violet", badge: "badge-violet" },
-  AUTRE: { label: "Autre document", short: "Autres", tone: "tone-slate", badge: "" },
+  CONVENTIONS: { label: "Convention de stage", short: "Conventions", tone: "tone-blue", badge: "badge-blue", icon: "clipboard" },
+  ATTESTATION: { label: "Attestation de présence", short: "Attestations", tone: "tone-teal", badge: "badge-teal", icon: "check" },
+  RAPPORT: { label: "Rapport de stage", short: "Rapports", tone: "tone-violet", badge: "badge-violet", icon: "briefcase" },
+  FICHE_NOTES: { label: "Fiche de notes", short: "Fiches de notes", tone: "tone-blue", badge: "badge-blue", icon: "trophy", auto: true },
+  AUTRE: { label: "Autre document", short: "Autres", tone: "tone-slate", badge: "", icon: "folder" },
 };
+
+// Initiales affichées dans la pastille du stagiaire (ex. « Esther Aka » → « EA »)
+const initials = (name) =>
+  (name || "?")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("");
 
 const emptyForm = { nom_fichier: "", type_doc: "CONVENTIONS", type_precision: "", stage: "" };
 
@@ -202,11 +213,7 @@ function Documents() {
         </div>
 
         {loading ? (
-          <div className="entity-grid">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="skeleton" style={{ height: 150 }} />
-            ))}
-          </div>
+          <SkeletonCards count={6} />
         ) : filtered.length === 0 ? (
           <EmptyState
             icon="folder"
@@ -229,61 +236,59 @@ function Documents() {
               const type = TYPES[doc.type_doc] || TYPES.AUTRE;
               const { title, sub } = stageLabel(doc.stage);
               return (
-                <div
+                <article
                   key={doc.id}
-                  className={`entity-card ${type.tone}`}
+                  className={`doc-card doc-${(TYPES[doc.type_doc] ? doc.type_doc : "AUTRE").toLowerCase()}`}
                   style={{ "--i": Math.min(i, 12) }} // rang pour l'apparition en cascade
                 >
-                  <div className="entity-card-head">
-                    <div className="doc-file" aria-hidden="true">
-                      <Icon name="fileText" size={20} />
-                      <span className="doc-file-ext">{extensionOf(doc.chemin_fichier)}</span>
-                    </div>
-                    <div style={{ minWidth: 0 }}>
-                      <div className="entity-title">{doc.nom_fichier}</div>
-                      <div className="cell-sub">
-                        {extensionOf(doc.chemin_fichier)} · ajouté le{" "}
-                        {formatDate(doc.date_ajout)}
-                      </div>
-                    </div>
+                  {/* Couverture colorée selon le type de document */}
+                  <div className="doc-cover" aria-hidden="true">
+                    <span className="doc-cover-icon">
+                      <Icon name={type.icon} size={26} />
+                    </span>
+                    <span className="doc-cover-ext">{extensionOf(doc.chemin_fichier)}</span>
                   </div>
 
-                  <div className="doc-stage">
-                    <div className="doc-stage-label">
-                      <Icon name="clipboard" size={12} /> Stage
-                    </div>
-                    <div className="cell-title" style={{ fontSize: "0.85rem" }}>{title}</div>
-                    {sub && <div className="cell-sub">{sub}</div>}
-                  </div>
-
-                  <div className="entity-meta" style={{ alignItems: "center" }}>
-                    <span className={`badge ${type.badge} truncate`} title={typeLabel(doc)}>
+                  <div className="doc-body">
+                    <span className="doc-type" title={typeLabel(doc)}>
                       {typeLabel(doc)}
                     </span>
-                    <div className="row-actions" style={{ marginLeft: "auto" }}>
-                      {doc.chemin_fichier && (
-                        <a
-                          className="btn btn-secondary btn-sm doc-open"
-                          href={doc.chemin_fichier}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          <Icon name="external" size={14} /> <span>Ouvrir</span>
-                        </a>
-                      )}
-                      {canEdit && (
-                        <button
-                          className="btn btn-danger-ghost btn-sm btn-icon"
-                          onClick={() => handleDelete(doc)}
-                          title="Supprimer"
-                          aria-label={`Supprimer ${doc.nom_fichier}`}
-                        >
-                          <Icon name="trash" size={15} />
-                        </button>
-                      )}
+                    <h3 className="doc-title" title={doc.nom_fichier}>
+                      {doc.nom_fichier}
+                    </h3>
+                    <div className="doc-date">
+                      <Icon name="calendar" size={13} /> Ajouté le {formatDate(doc.date_ajout)}
+                    </div>
+
+                    <div className="doc-person" title={`${title}${sub ? ` — ${sub}` : ""}`}>
+                      <span className="doc-person-avatar">{initials(sub)}</span>
+                      <span className="doc-person-text">
+                        <strong>{sub || "Stagiaire inconnu"}</strong>
+                        <span>{title}</span>
+                      </span>
                     </div>
                   </div>
-                </div>
+
+                  <div className="doc-foot">
+                    {doc.chemin_fichier ? (
+                      <a className="doc-action" href={doc.chemin_fichier} target="_blank" rel="noreferrer">
+                        <Icon name="eye" size={15} /> Consulter
+                      </a>
+                    ) : (
+                      <span className="doc-action is-disabled">Fichier indisponible</span>
+                    )}
+                    {canEdit && (
+                      <button
+                        className="doc-delete"
+                        onClick={() => handleDelete(doc)}
+                        title="Supprimer"
+                        aria-label={`Supprimer ${doc.nom_fichier}`}
+                      >
+                        <Icon name="trash" size={15} />
+                      </button>
+                    )}
+                  </div>
+                </article>
               );
             })}
           </div>
@@ -325,7 +330,9 @@ function Documents() {
             <div className="field">
               <label className="label" htmlFor="type_doc">Type</label>
               <select id="type_doc" name="type_doc" className="input" value={formData.type_doc} onChange={handleChange}>
-                {Object.entries(TYPES).map(([key, t]) => (
+                {Object.entries(TYPES)
+                  .filter(([, t]) => !t.auto)
+                  .map(([key, t]) => (
                   <option key={key} value={key}>{t.label}</option>
                 ))}
               </select>

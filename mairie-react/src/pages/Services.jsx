@@ -9,11 +9,46 @@ import Modal from "../components/ui/Modal";
 import EtablissementMap from "../components/services/EtablissementMap";
 import { etabMapQuery } from "../utils/etablissement";
 import { apiErrorMessage } from "../utils/format";
+import { SkeletonCards } from "../components/ui/Skeleton";
 
 const emptyService = { nom: "", description: "" };
 const emptyEtab = { nom: "", ville: "", localisation: "", email_contact: "", telephone: "" };
 
 const plural = (n, word) => `${n} ${word}${n > 1 ? "s" : ""}`;
+
+// Palette de 12 teintes bien distinctes, ordonnées pour que deux cartes voisines
+// ne se ressemblent jamais (bleu, orange, vert, rose, violet, jaune…)
+const PALETTE = [
+  { tone: "#2563eb", soft: "#dbeafe" }, // bleu
+  { tone: "#ea580c", soft: "#ffedd5" }, // orange
+  { tone: "#059669", soft: "#d1fae5" }, // émeraude
+  { tone: "#e11d48", soft: "#ffe4e6" }, // rose
+  { tone: "#7c3aed", soft: "#ede9fe" }, // violet
+  { tone: "#ca8a04", soft: "#fef9c3" }, // jaune moutarde
+  { tone: "#0891b2", soft: "#cffafe" }, // cyan
+  { tone: "#c026d3", soft: "#fae8ff" }, // fuchsia
+  { tone: "#65a30d", soft: "#ecfccb" }, // vert anis
+  { tone: "#4338ca", soft: "#e0e7ff" }, // indigo
+  { tone: "#0d9488", soft: "#ccfbf1" }, // sarcelle
+  { tone: "#92400e", soft: "#fef3c7" }, // brun
+];
+
+// Couleur d'un élément selon son rang (par identifiant) dans la liste complète :
+// chacun a sa propre teinte, et elle ne change pas quand on filtre ou recherche.
+const colorOf = (items, id) => {
+  const rank = [...items].sort((a, b) => a.id - b.id).findIndex((x) => x.id === id);
+  const c = PALETTE[Math.max(rank, 0) % PALETTE.length];
+  return { "--tone": c.tone, "--tone-soft": c.soft };
+};
+
+// Monogramme : initiales des deux premiers mots significatifs (« Institut Supérieur » → « IS »)
+const monogram = (nom = "") =>
+  nom
+    .split(/[\s'-]+/)
+    .filter((w) => w.length > 2 || /^[A-Z0-9]+$/.test(w))
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("") || "?";
 
 function Services() {
   const { can } = useAuth();
@@ -204,11 +239,7 @@ function Services() {
         </div>
 
         {loading ? (
-          <div className="entity-grid">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="skeleton" style={{ height: 150 }} />
-            ))}
-          </div>
+          <SkeletonCards count={6} />
         ) : isServices ? (
           filteredServices.length === 0 ? (
             <EmptyState
@@ -221,40 +252,40 @@ function Services() {
               }
             />
           ) : (
-            <div className="entity-grid services-grid">
+            <div className="org-grid">
               {filteredServices.map((srv, i) => {
                 const nbTuteurs = utilisateurs.filter((u) => u.role === "TUTEUR" && u.service === srv.id).length;
                 const srvStages = stages.filter((s) => s.service === srv.id);
                 const nbEnCours = srvStages.filter((s) => s.statut === "EN_COURS").length;
-                const visual = serviceVisual(srv); // icône + couleur selon le type de service
+                const visual = serviceVisual(srv); // icône selon le type de service
+                const activite = srvStages.length ? Math.round((nbEnCours / srvStages.length) * 100) : 0;
                 return (
-                  <div
+                  <article
                     key={srv.id}
-                    className={`entity-card ${visual.tone}`}
-                    style={{ "--i": Math.min(i, 12) }} // rang pour l'apparition en cascade
+                    className="org-card"
+                    // rang pour l'apparition en cascade + couleur propre au service
+                    style={{ "--i": Math.min(i, 12), ...colorOf(services, srv.id) }}
                   >
-                    <div className="entity-card-head">
-                      <div className="entity-icon">
-                        <Icon name={visual.icon} size={20} />
-                      </div>
-                      <div style={{ minWidth: 0 }}>
-                        <div className="entity-title">{srv.nom}</div>
-                        <div className="entity-desc">
-                          {srv.description || "Aucune description."}
-                        </div>
+                    <header className="org-head">
+                      <span className="org-icon">
+                        <Icon name={visual.icon} size={22} />
+                      </span>
+                      <div className="org-titles">
+                        <h3 className="org-name" title={srv.nom}>{srv.nom}</h3>
+                        <p className="org-desc">{srv.description || "Aucune description."}</p>
                       </div>
                       {canEdit && (
-                        <div className="row-actions">
+                        <div className="org-tools">
                           <button
-                            className="btn btn-ghost btn-sm btn-icon"
+                            className="org-tool"
                             onClick={() => openForm("service", srv)}
                             aria-label={`Modifier ${srv.nom}`}
                             title="Modifier"
                           >
-                            <Icon name="pencil" size={15} />
+                            <Icon name="pencil" size={14} />
                           </button>
                           <button
-                            className="btn btn-danger-ghost btn-sm btn-icon"
+                            className="org-tool danger"
                             onClick={() =>
                               handleDelete(
                                 "service",
@@ -267,23 +298,37 @@ function Services() {
                             aria-label={`Supprimer ${srv.nom}`}
                             title="Supprimer"
                           >
-                            <Icon name="trash" size={15} />
+                            <Icon name="trash" size={14} />
                           </button>
                         </div>
                       )}
+                    </header>
+
+                    <div className="org-stats">
+                      <div className="org-stat">
+                        <strong>{nbTuteurs}</strong>
+                        <span>Encadrant{nbTuteurs > 1 ? "s" : ""}</span>
+                      </div>
+                      <div className="org-stat">
+                        <strong>{srvStages.length}</strong>
+                        <span>Stage{srvStages.length > 1 ? "s" : ""}</span>
+                      </div>
+                      <div className={`org-stat ${nbEnCours ? "is-live" : ""}`}>
+                        <strong>{nbEnCours}</strong>
+                        <span>En cours</span>
+                      </div>
                     </div>
-                    <div className="entity-meta">
-                      <span className="badge">
-                        <Icon name="userCheck" size={13} /> {plural(nbTuteurs, "tuteur")}
-                      </span>
-                      <span className="badge">
-                        <Icon name="clipboard" size={13} /> {plural(srvStages.length, "stage")}
-                      </span>
-                      {nbEnCours > 0 && (
-                        <span className="badge badge-blue badge-dot">{nbEnCours} en cours</span>
-                      )}
+
+                    <div className="org-activity" title={`${activite}% des stages du service sont en cours`}>
+                      <div className="org-activity-label">
+                        <span>Stages en cours</span>
+                        <strong>{activite}%</strong>
+                      </div>
+                      <div className="org-activity-track">
+                        <span style={{ width: `${activite}%` }} />
+                      </div>
                     </div>
-                  </div>
+                  </article>
                 );
               })}
             </div>
@@ -299,105 +344,86 @@ function Services() {
             }
           />
         ) : (
-          <div className="table-wrap">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Établissement</th>
-                  <th>Contact</th>
-                  <th>Téléphone</th>
-                  <th className="num">Stagiaires</th>
-                  {canEdit && <th className="col-actions">Actions</th>}
-                </tr>
-              </thead>
-              <tbody>
-                {filteredEtabs.map((etab) => {
-                  const nb = stagiaires.filter((s) => s.etablissement === etab.id).length;
-                  return (
-                    <tr
-                      key={etab.id}
-                      className="row-clickable"
-                      onClick={() => setMapEtab(etab)}
-                      onKeyDown={(e) => {
-                        if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) {
-                          e.preventDefault();
-                          setMapEtab(etab);
-                        }
-                      }}
-                      tabIndex={0}
-                      title="Voir la position sur la carte"
-                    >
-                      <td>
-                        <div className="person">
-                          <div className="entity-icon tone-teal" style={{ width: 36, height: 36 }}>
-                            <Icon name="graduation" size={17} />
-                          </div>
-                          <div>
-                            <div className="person-name">{etab.nom}</div>
-                            <div className="person-meta">
-                              <Icon name="mapPin" size={12} /> {etab.ville}
-                              <span className="map-link">Voir sur la carte</span>
-                            </div>
-                            {etab.localisation && (
-                              <div className="person-meta etab-localisation" title={etab.localisation}>
-                                {etab.localisation}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <span className="contact" title={etab.email_contact}>
-                          <Icon name="mail" size={14} />
-                          <span className="truncate">{etab.email_contact}</span>
-                        </span>
-                      </td>
-                      <td>
-                        {etab.telephone ? (
-                          <span className="contact">
-                            <Icon name="phone" size={14} />
-                            {etab.telephone}
-                          </span>
-                        ) : (
-                          <span className="muted">Non renseigné</span>
-                        )}
-                      </td>
-                      <td className="num">
-                        <span className="badge badge-teal">{nb}</span>
-                      </td>
-                      {canEdit && (
-                        <td className="col-actions" onClick={(e) => e.stopPropagation()}>
-                          <div className="row-actions">
-                            <button
-                              className="btn btn-ghost btn-sm btn-icon"
-                              onClick={() => openForm("etablissement", etab)}
-                              aria-label={`Modifier ${etab.nom}`}
-                              title="Modifier"
-                            >
-                              <Icon name="pencil" size={15} />
-                            </button>
-                            <button
-                              className="btn btn-danger-ghost btn-sm btn-icon"
-                              onClick={() =>
-                                handleDelete(
-                                  "etablissement",
-                                  etab,
-                                  nb ? `${plural(nb, "stagiaire")} n'auront plus d'établissement associé.` : "",
-                                )
-                              }
-                              aria-label={`Supprimer ${etab.nom}`}
-                              title="Supprimer"
-                            >
-                              <Icon name="trash" size={15} />
-                            </button>
-                          </div>
-                        </td>
+          <div className="org-grid">
+            {filteredEtabs.map((etab, i) => {
+              const nb = stagiaires.filter((st) => st.etablissement === etab.id).length;
+              return (
+                <article
+                  key={etab.id}
+                  className="org-card etab-card"
+                  style={{ "--i": Math.min(i, 12), ...colorOf(etablissements, etab.id) }}
+                >
+                  <header className="org-head">
+                    <span className="org-monogram" aria-hidden="true">{monogram(etab.nom)}</span>
+                    <div className="org-titles">
+                      <h3 className="org-name" title={etab.nom}>{etab.nom}</h3>
+                      <p className="org-city">
+                        <Icon name="mapPin" size={13} /> {etab.ville}
+                      </p>
+                    </div>
+                    {canEdit && (
+                      <div className="org-tools">
+                        <button
+                          className="org-tool"
+                          onClick={() => openForm("etablissement", etab)}
+                          aria-label={`Modifier ${etab.nom}`}
+                          title="Modifier"
+                        >
+                          <Icon name="pencil" size={14} />
+                        </button>
+                        <button
+                          className="org-tool danger"
+                          onClick={() =>
+                            handleDelete(
+                              "etablissement",
+                              etab,
+                              nb ? `${plural(nb, "stagiaire")} n'auront plus d'établissement associé.` : "",
+                            )
+                          }
+                          aria-label={`Supprimer ${etab.nom}`}
+                          title="Supprimer"
+                        >
+                          <Icon name="trash" size={14} />
+                        </button>
+                      </div>
+                    )}
+                  </header>
+
+                  {etab.localisation && (
+                    <p className="etab-loc" title={etab.localisation}>
+                      {etab.localisation}
+                    </p>
+                  )}
+
+                  <ul className="etab-contacts">
+                    <li>
+                      <Icon name="mail" size={14} />
+                      <a href={`mailto:${etab.email_contact}`} title={etab.email_contact}>
+                        {etab.email_contact}
+                      </a>
+                    </li>
+                    <li>
+                      <Icon name="phone" size={14} />
+                      {etab.telephone ? (
+                        <a href={`tel:${etab.telephone}`}>{etab.telephone}</a>
+                      ) : (
+                        <span className="muted">Non renseigné</span>
                       )}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                    </li>
+                  </ul>
+
+                  <footer className="etab-foot">
+                    <span className="etab-count">
+                      <Icon name="graduation" size={14} />
+                      {plural(nb, "stagiaire")}
+                    </span>
+                    <button type="button" className="etab-map-btn" onClick={() => setMapEtab(etab)}>
+                      <Icon name="mapPin" size={14} /> Voir sur la carte
+                    </button>
+                  </footer>
+                </article>
+              );
+            })}
           </div>
         )}
       </div>

@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models.functions import ExtractMonth
-from django.db.models import Count
+from django.db.models import Count, Q
 from rest_framework import status, viewsets
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.decorators import action
@@ -9,6 +9,9 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.throttling import ScopedRateThrottle
 from urllib.parse import urlencode
 from django.conf import settings
+from django.utils import timezone
+from django.db import transaction
+from django.core.files.base import ContentFile
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -19,7 +22,10 @@ from rest_framework.exceptions import PermissionDenied
 from .acces import Connecte, EstAdmin, GestionUtilisateursPermission, ModulePermission, est_admin, est_tuteur
 from .invitations import email_en_mode_console, envoyer_lien_reinitialisation, inviter
 from .models import AccesRole, Document, Etablissement, Service, Stage, Stagiaire, Utilisateur
-from .notifications import notifier_affectation
+from .notifications import (
+  notifier_affectation, notifier_cloture, notifier_evaluation, notifier_reouverture, notifier_retour,
+)
+from .fiches import generer_fiche_notes
 from .serializers import (
     ChangerMotDePasseSerializer,
     DocumentSerializer,
@@ -142,6 +148,142 @@ class StageViewSet(viewsets.ModelViewSet):
     if stage.tuteur_id and stage.tuteur_id != ancien_tuteur_id:
       notifier_affectation(stage, self.request.user)
 
+  # --- Workflow de validation -------------------------------------------------------------
+  # 1. Documents : l'encadrant les ajoute au dossier (module Documents).
+  # 2. valider-encadrant : l'encadrant évalue (note + appréciation) -> statut VALIDE.
+  # 3. valider-rh : l'agent RH valide -> statut TERMINE + fiche de notes PDF ; ou renvoyer -> EN_COURS.
+  # Ces actions ont leurs propres règles : un encadrant peut les utiliser même sans accès au module « stages ».
+
+  def get_permissions(self):
+    if self.action in ('valider_encadrant', 'valider_rh', 'renvoyer', 'rouvrir'):
+      return [Connecte()]
+    return super().get_permissions()
+
+  @staticmethod
+  def _peut_valider_rh(user):
+    return est_admin(user) or getattr(user, 'role', None) == 'RH'
+
+  @action(detail=True, methods=['post'], url_path='valider-encadrant')
+  def valider_encadrant(self, request, pk=None):
+    stage = self.get_object()
+    if not (est_admin(request.user) or stage.tuteur_id == request.user.id):
+      raise PermissionDenied("Seul l'encadrant de ce stage peut l'évaluer.")
+    if stage.statut != 'EN_COURS':
+      return Response(
+        {'detail': "Seul un stage en cours peut être évalué (statut actuel : %s)." % stage.get_statut_display()},
+        status=status.HTTP_400_BAD_REQUEST,
+      )
+    try:
+      note = round(float(str(request.data.get('note', '')).replace(',', '.')), 2)
+    except ValueError:
+      note = None
+    if note is None or not 0 <= note <= 20:
+      return Response({'note': ['Indiquez une note comprise entre 0 et 20.']}, status=status.HTTP_400_BAD_REQUEST)
+    appreciation = str(request.data.get('appreciation', '')).strip()
+    if len(appreciation) < 10:
+      return Response(
+        {'appreciation': ['Rédigez une appréciation (10 caractères minimum).']}, status=status.HTTP_400_BAD_REQUEST
+      )
+
+    stage.gratification = note
+    stage.appreciation = appreciation[:3000]
+    stage.statut = 'VALIDE'
+    stage.evalue_le = timezone.now()
+    stage.evalue_par = request.user
+    stage.motif_retour = ''
+    stage.valide_rh_le = None
+    stage.valide_rh_par = None
+    stage.save()
+    notifier_evaluation(stage, request.user)
+    return Response(StageSerializer(stage, context={'request': request}).data)
+
+  @action(detail=True, methods=['post'], url_path='valider-rh')
+  def valider_rh(self, request, pk=None):
+    stage = self.get_object()
+    if not self._peut_valider_rh(request.user):
+      raise PermissionDenied("La validation finale est réservée aux agents RH.")
+    if stage.statut != 'VALIDE':
+      return Response(
+        {'detail': "Le stage doit d'abord être évalué et validé par son encadrant."},
+        status=status.HTTP_400_BAD_REQUEST,
+      )
+
+    with transaction.atomic():
+      stage.statut = 'TERMINE'
+      stage.valide_rh_le = timezone.now()
+      stage.valide_rh_par = request.user
+      stage.save()
+
+      # Fiche de notes : une seule par stage, régénérée si elle existait déjà
+      for ancienne in Document.objects.filter(stage=stage, type_doc='FICHE_NOTES'):
+        ancienne.chemin_fichier.delete(save=False)
+        ancienne.delete()
+      fiche = Document(
+        nom_fichier=f'Fiche de notes - {stage.stagiaire.prenom} {stage.stagiaire.nom}',
+        type_doc='FICHE_NOTES',
+        stage=stage,
+      )
+      fiche.chemin_fichier.save(f'fiche_notes_stage_{stage.id}.pdf', ContentFile(generer_fiche_notes(stage)), save=False)
+      fiche.save()
+
+    notifier_cloture(stage, request.user)
+    data = StageSerializer(stage, context={'request': request}).data
+    data['fiche'] = DocumentSerializer(fiche, context={'request': request}).data
+    return Response(data)
+
+  @staticmethod
+  def _reinitialiser_fiche(stage):
+    """Efface tout ce que contient la fiche de notes (note, appréciation, validations) et supprime le PDF."""
+    stage.gratification = 0
+    stage.appreciation = ''
+    stage.evalue_le = None
+    stage.evalue_par = None
+    stage.valide_rh_le = None
+    stage.valide_rh_par = None
+    for fiche in Document.objects.filter(stage=stage, type_doc='FICHE_NOTES'):
+      fiche.chemin_fichier.delete(save=False)
+      fiche.delete()
+
+  @action(detail=True, methods=['post'])
+  def rouvrir(self, request, pk=None):
+    """L'agent RH rouvre un stage terminé : la fiche de notes est réinitialisée et le stage
+    reprend le workflow (évaluation de l'encadrant, puis validation RH)."""
+    stage = self.get_object()
+    if not self._peut_valider_rh(request.user):
+      raise PermissionDenied('Seul un agent RH peut rouvrir un stage terminé.')
+    if stage.statut != 'TERMINE':
+      return Response({'detail': 'Seul un stage terminé peut être rouvert.'}, status=status.HTTP_400_BAD_REQUEST)
+    motif = str(request.data.get('motif', '')).strip()
+    if len(motif) < 5:
+      return Response({'motif': ['Précisez le motif de la réouverture.']}, status=status.HTTP_400_BAD_REQUEST)
+
+    with transaction.atomic():
+      self._reinitialiser_fiche(stage)
+      stage.statut = 'EN_COURS'
+      # Le motif s'affiche chez l'encadrant, comme pour un renvoi
+      stage.motif_retour = f'Stage rouvert : {motif}'[:1000]
+      stage.save()
+
+    notifier_reouverture(stage, request.user, motif)
+    return Response(StageSerializer(stage, context={'request': request}).data)
+
+  @action(detail=True, methods=['post'])
+  def renvoyer(self, request, pk=None):
+    stage = self.get_object()
+    if not self._peut_valider_rh(request.user):
+      raise PermissionDenied("Seul un agent RH peut renvoyer le dossier à l'encadrant.")
+    if stage.statut != 'VALIDE':
+      return Response({'detail': "Seul un dossier en attente de validation RH peut être renvoyé."},
+                      status=status.HTTP_400_BAD_REQUEST)
+    motif = str(request.data.get('motif', '')).strip()
+    if len(motif) < 5:
+      return Response({'motif': ['Précisez le motif du renvoi.']}, status=status.HTTP_400_BAD_REQUEST)
+    stage.statut = 'EN_COURS'
+    stage.motif_retour = motif[:1000]
+    stage.save(update_fields=['statut', 'motif_retour'])
+    notifier_retour(stage, request.user, motif)
+    return Response(StageSerializer(stage, context={'request': request}).data)
+
 
 class DocumentViewSet(viewsets.ModelViewSet):
   permission_classes = [ModulePermission]
@@ -149,9 +291,10 @@ class DocumentViewSet(viewsets.ModelViewSet):
   queryset = Document.objects.all()
   serializer_class = DocumentSerializer
 
-  # Un encadrant ne voit que les documents des stages qu'il encadre
+  # Un encadrant ne voit que les documents des stages qu'il encadre.
+  # La fiche de notes n'est visible qu'une fois le stage terminé (toutes les validations effectuées).
   def get_queryset(self):
-    queryset = Document.objects.all()
+    queryset = Document.objects.exclude(Q(type_doc='FICHE_NOTES') & ~Q(stage__statut='TERMINE'))
     if est_tuteur(self.request.user):
       queryset = queryset.filter(stage__tuteur=self.request.user)
     return queryset
@@ -251,6 +394,8 @@ class AccesView(APIView):
             'roles': ['ADMIN', *acces.ROLES_CONFIGURABLES],
             'matrice': acces.matrice(),
             'defauts': acces.DEFAUTS,
+            # Niveau maximum autorisé par rôle et par module (ex. tuteur : lecture seule sur les stages)
+            'plafonds': {r: {m: acces.plafond(r, m) for m in acces.MODULE_IDS} for r in acces.ROLES_CONFIGURABLES},
         })
 
     def get(self, request):
@@ -269,8 +414,7 @@ class AccesView(APIView):
                     niveau = int(niveau)
                 except (TypeError, ValueError):
                     continue
-                maxi = acces.LECTURE if module in acces.MODULES_LECTURE_SEULE else acces.COMPLET
-                niveau = max(acces.AUCUN, min(niveau, maxi))
+                niveau = max(acces.AUCUN, min(niveau, acces.plafond(role, module)))
                 AccesRole.objects.update_or_create(role=role, module=module, defaults={'niveau': niveau})
 
         return self._reponse()

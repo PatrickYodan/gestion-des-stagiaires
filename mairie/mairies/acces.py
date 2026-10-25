@@ -43,6 +43,22 @@ DEFAUTS = {
 }
 
 
+# Niveaux maximum imposés à certains rôles, quelle que soit la configuration :
+# un tuteur consulte les stagiaires et les stages (et en fait le suivi), mais ne peut ni créer,
+# ni modifier, ni supprimer. Le suivi (documents, évaluation) passe par ses propres règles.
+PLAFONDS = {
+    'TUTEUR': {
+        'stagiaires': LECTURE,
+        'stages': LECTURE,
+    },
+}
+
+
+def plafond(role, module):
+    maxi = LECTURE if module in MODULES_LECTURE_SEULE else COMPLET
+    return min(maxi, PLAFONDS.get(role, {}).get(module, COMPLET))
+
+
 def premiere_connexion_en_attente(user):
     return bool(user and user.is_authenticated and getattr(user, 'doit_changer_mdp', False))
 
@@ -71,7 +87,7 @@ def matrice():
 
     resultat = {role: dict(DEFAUTS[role]) for role in ROLES_CONFIGURABLES}
     for acces in AccesRole.objects.filter(role__in=ROLES_CONFIGURABLES, module__in=MODULE_IDS):
-        resultat[acces.role][acces.module] = acces.niveau
+        resultat[acces.role][acces.module] = min(acces.niveau, plafond(acces.role, acces.module))
     resultat['ADMIN'] = {m: COMPLET for m in MODULE_IDS}
     return resultat
 
@@ -86,9 +102,8 @@ def niveau_pour(user, module):
     from .models import AccesRole
 
     acces = AccesRole.objects.filter(role=user.role, module=module).first()
-    if acces is not None:
-        return acces.niveau
-    return DEFAUTS.get(user.role, {}).get(module, AUCUN)
+    niveau = acces.niveau if acces is not None else DEFAUTS.get(user.role, {}).get(module, AUCUN)
+    return min(niveau, plafond(user.role, module))
 
 
 class ModulePermission(BasePermission):

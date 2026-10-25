@@ -4,6 +4,7 @@ import AuthLayout from "../components/layout/AuthLayout";
 import Icon from "../components/ui/Icon";
 import { apiErrorMessage } from "../utils/format";
 import { LOGIN_PATH, handleLinkClick } from "../utils/router";
+import Logo from "../components/ui/Logo";
 
 // Demande d'un lien de réinitialisation du mot de passe, envoyé par e-mail
 function MotDePasseOublie() {
@@ -67,7 +68,7 @@ function MotDePasseOublie() {
       ) : (
         <form onSubmit={handleSubmit} className="login-form">
           <div className="brand-mark">
-            <Icon name="landmark" size={20} />
+            <Logo size={40} />
           </div>
 
           <div>

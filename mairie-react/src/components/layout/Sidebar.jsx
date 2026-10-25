@@ -2,6 +2,7 @@ import { useAuth } from "../../context/AuthContext";
 import Icon from "../ui/Icon";
 import { ROUTES, handleLinkClick } from "../../utils/router";
 import { useUnreadCount } from "../../utils/messagerie";
+import Logo from "../ui/Logo";
 
 function Sidebar({ activeTab, open, collapsed, onClose }) {
   const { user, can } = useAuth();
@@ -84,7 +85,7 @@ function Sidebar({ activeTab, open, collapsed, onClose }) {
       <aside className={`sidebar ${open ? "open" : ""} ${collapsed ? "collapsed" : ""}`}>
         <div className="sidebar-brand">
           <div className="brand-mark">
-            <Icon name="landmark" size={20} />
+            <Logo size={40} />
           </div>
           <div className="sidebar-label">
             <div className="brand-name">Gestion des Stagiaires</div>

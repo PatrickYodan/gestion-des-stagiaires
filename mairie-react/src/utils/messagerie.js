@@ -22,7 +22,7 @@ const publish = (value) => {
 export const refreshUnread = () => {
   if (!localStorage.getItem("access_token")) return;
   api
-    .get("messagerie/non-lus/")
+    .get("messagerie/non-lus/", { silent: true }) // vérification périodique : pas de barre de chargement
     .then((res) => publish(res.data.non_lus || 0))
     .catch(() => {});
 };

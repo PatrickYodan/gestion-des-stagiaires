@@ -2,24 +2,11 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Icon from "../ui/Icon";
 import { formatDate, formatNote, fullName, isNoted, NOTE_MAX } from "../../utils/format";
+import Logo from "../ui/Logo";
+import { STATUTS as STATUTS_WORKFLOW, mentionOf } from "../../utils/workflow";
 
-const STATUTS = {
-  EN_ATTENTE: "En attente de validation",
-  EN_COURS: "En cours",
-  VALIDE: "Validé",
-  TERMINE: "Terminé",
-  ANNULEE: "Annulé",
-};
-
-// Mention correspondant à la note sur 20
-const mentionOf = (note) => {
-  const n = Number(note);
-  if (n >= 16) return "Très bien";
-  if (n >= 14) return "Bien";
-  if (n >= 12) return "Assez bien";
-  if (n >= 10) return "Passable";
-  return "Insuffisant";
-};
+const STATUTS = Object.fromEntries(Object.entries(STATUTS_WORKFLOW).map(([k, v]) => [k, v.label]));
+const formatJour = (iso) => (iso ? formatDate(iso, { day: "numeric", month: "long", year: "numeric" }) : "");
 
 const durationLabel = (debut, fin) => {
   const days = Math.round((new Date(fin) - new Date(debut)) / 86400000) + 1;
@@ -42,7 +29,10 @@ function Row({ label, children }) {
 // Fiche de note de stage imprimable (impression ou « Enregistrer au format PDF » du navigateur)
 function FicheNoteStage({ stagiaire, stages, services, utilisateurs, etablissements, onClose }) {
   // Par défaut : le stage le plus récent
-  const sorted = [...stages].sort((a, b) => String(b.date_debut).localeCompare(String(a.date_debut)));
+  // Seuls les stages terminés (toutes les validations faites) ont une fiche de notes
+  const sorted = stages
+    .filter((s) => s.statut === "TERMINE")
+    .sort((a, b) => String(b.date_debut).localeCompare(String(a.date_debut)));
   const [stageId, setStageId] = useState(sorted[0]?.id ?? null);
 
   useEffect(() => {
@@ -98,16 +88,17 @@ function FicheNoteStage({ stagiaire, stages, services, utilisateurs, etablisseme
         {!stage ? (
           <div className="fiche-sheet fiche-empty">
             <Icon name="clipboard" size={28} />
-            <h3>Aucun stage enregistré</h3>
-            <p>Affectez d'abord ce stagiaire à un stage (onglet Affectations & Stages) pour éditer sa fiche de note.</p>
+            <h3>Fiche de notes indisponible</h3>
+            <p>
+              La fiche de notes est établie quand le stage est terminé : évaluation par l'encadrant, puis validation
+              par l'agent RH.
+            </p>
           </div>
         ) : (
           <article className="fiche-sheet">
             <header className="fiche-head">
               <div className="fiche-org">
-                <div className="fiche-logo">
-                  <Icon name="landmark" size={22} />
-                </div>
+                <Logo size={44} className="fiche-logo-svg" />
                 <div>
                   <strong>MAIRIE</strong>
                   <span>Service des ressources humaines</span>
@@ -179,12 +170,16 @@ function FicheNoteStage({ stagiaire, stages, services, utilisateurs, etablisseme
               </div>
               <div className="fiche-missions">
                 <div className="fiche-label">Appréciation du tuteur</div>
-                <div className="fiche-lines">
-                  <span />
-                  <span />
-                  <span />
-                  <span />
-                </div>
+                {stage.appreciation ? (
+                  <p>{stage.appreciation}</p>
+                ) : (
+                  <div className="fiche-lines">
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                )}
               </div>
             </section>
 
@@ -197,12 +192,12 @@ function FicheNoteStage({ stagiaire, stages, services, utilisateurs, etablisseme
               <div>
                 <span className="fiche-label">Le tuteur</span>
                 <strong>{tuteur ? fullName(tuteur) : " "}</strong>
-                <em>Date et signature</em>
+                <em>{stage.evalue_le ? `Évaluation validée le ${formatJour(stage.evalue_le)}` : "Date et signature"}</em>
               </div>
               <div>
                 <span className="fiche-label">Le responsable RH</span>
-                <strong>&nbsp;</strong>
-                <em>Date, signature et cachet</em>
+                <strong>{stage.valide_rh_par_nom || "\u00a0"}</strong>
+                <em>{stage.valide_rh_le ? `Stage validé le ${formatJour(stage.valide_rh_le)}` : "Date, signature et cachet"}</em>
               </div>
             </section>
 

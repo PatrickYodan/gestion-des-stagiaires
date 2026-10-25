@@ -9,6 +9,7 @@ import { formatHeure, formatJour, formatQuand, memeJour, refreshUnread } from ".
 import { ROLES } from "../utils/roles";
 import { navigate, pathSegments, usePath } from "../utils/router";
 import { isSoundEnabled, playMessageSound, setSoundEnabled } from "../utils/notificationSound";
+import { SkeletonChatList, SkeletonThread } from "../components/ui/Skeleton";
 
 const LIST_POLL_MS = 8000; // rafraîchissement de la liste des conversations
 const THREAD_POLL_MS = 4000; // rafraîchissement de la conversation ouverte
@@ -72,7 +73,7 @@ function ContactPicker({ onClose, onPick }) {
             </div>
           )}
           {!contacts && !error ? (
-            [0, 1, 2].map((i) => <div key={i} className="skeleton" style={{ height: 52, marginBottom: 8 }} />)
+            <SkeletonChatList rows={4} />
           ) : filtered.length === 0 ? (
             <p className="muted" style={{ textAlign: "center", padding: "1.5rem 0" }}>
               Aucun contact ne correspond.
@@ -132,7 +133,7 @@ function Messagerie() {
   // Liste des conversations (rafraîchie régulièrement)
   const loadConversations = () =>
     api
-      .get(`messagerie/conversations/?dossier=${dossierRef.current}`)
+      .get(`messagerie/conversations/?dossier=${dossierRef.current}`, { silent: true })
       .then((res) => {
         if (res.data.dossier !== dossierRef.current) return; // réponse d'un dossier quitté entre-temps
         setConversations(res.data.conversations);
@@ -203,7 +204,7 @@ function Messagerie() {
     const poll = setInterval(() => {
       if (document.hidden || lastIdRef.current === null) return;
       api
-        .get(`messagerie/conversations/${selectedId}/messages/?apres=${lastIdRef.current}`)
+        .get(`messagerie/conversations/${selectedId}/messages/?apres=${lastIdRef.current}`, { silent: true })
         .then((res) => {
           if (cancelled) return;
           const fresh = res.data.messages;
@@ -438,7 +439,7 @@ function Messagerie() {
 
           <div className="chat-list-items">
             {conversations === null ? (
-              [0, 1, 2, 3].map((i) => <div key={i} className="skeleton" style={{ height: 56, margin: "0.6rem 0.75rem" }} />)
+              <SkeletonChatList rows={6} />
             ) : visibleConversations.length === 0 ? (
               <EmptyState
                 icon={dossier === "archives" ? "archive" : dossier === "brouillons" ? "pencil" : "mail"}
@@ -592,7 +593,7 @@ function Messagerie() {
 
               <div className="chat-messages" ref={scrollRef} onScroll={onScroll}>
                 {!thread ? (
-                  <div className="skeleton" style={{ height: 120, margin: "1rem" }} />
+                  <SkeletonThread />
                 ) : thread.messages.length === 0 ? (
                   <div className="chat-start">
                     <Icon name="mail" size={22} />
