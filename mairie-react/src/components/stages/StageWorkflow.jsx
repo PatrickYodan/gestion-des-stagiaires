@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import Icon from "../ui/Icon";
 import { apiErrorMessage, formatDate, fullName } from "../../utils/format";
 import { DOCUMENTS_REQUIS, STATUTS, etapeCourante, finAtteinte, mentionOf } from "../../utils/workflow";
+import { confirmer } from "../../utils/confirm";
 
 const TYPES_AJOUT = [
   ...DOCUMENTS_REQUIS,
@@ -106,6 +107,22 @@ function StageWorkflow({ stage: initialStage, stagiaire, tuteurNom, serviceNom, 
     }
   };
 
+  // Retire un document du dossier (la fiche de notes, générée automatiquement, n'est pas concernée)
+  const supprimerDocument = async (doc) => {
+    const ok = await confirmer({
+      titre: "Supprimer ce document ?",
+      message: doc.nom_fichier,
+      details: "Il sera retiré du dossier du stage et le fichier sera définitivement effacé.",
+      confirmer: "Supprimer",
+      danger: true,
+    });
+    if (!ok) return;
+    run(`suppr-${doc.id}`, async () => {
+      await api.delete(`documents/${doc.id}/`);
+      setDocuments((list) => (list || []).filter((d) => d.id !== doc.id));
+    });
+  };
+
   const envoyerDocument = (e) => {
     e.preventDefault();
     if (!file) {
@@ -128,12 +145,16 @@ function StageWorkflow({ stage: initialStage, stagiaire, tuteurNom, serviceNom, 
     });
   };
 
-  const validerEncadrant = (e) => {
+  const validerEncadrant = async (e) => {
     e.preventDefault();
     if (!finAtteinte(stage)) {
-      const ok = window.confirm(
-        `Le stage n'est pas encore terminé (fin prévue le ${formatDate(stage.date_fin)}).\n\nValider quand même l'évaluation ?`,
-      );
+      const ok = await confirmer({
+        titre: "Valider l'évaluation avant la fin du stage ?",
+        message: `La fin du stage est prévue le ${formatDate(stage.date_fin)}.`,
+        details: "Le dossier sera transmis à l'agent RH pour la validation finale.",
+        confirmer: "Valider quand même",
+        icon: "clock",
+      });
       if (!ok) return;
     }
     run("evaluer", async () => {
@@ -199,12 +220,55 @@ function StageWorkflow({ stage: initialStage, stagiaire, tuteurNom, serviceNom, 
           </button>
         </div>
 
-        <div className="wf-summary">
+        <div className="wf-layout">
+        {/* Récapitulatif : sur ordinateur, panneau fixe à gauche ; sur téléphone, bandeau au-dessus */}
+        <aside className="wf-summary">
+          <div className="wf-summary-who">
+            <span className="wf-summary-avatar">
+              {fullName(stagiaire)
+                .split(/\s+/)
+                .filter(Boolean)
+                .slice(0, 2)
+                .map((w) => w[0].toUpperCase())
+                .join("") || "?"}
+            </span>
+            <div>
+              <strong>{fullName(stagiaire) || "Stagiaire"}</strong>
+              <span>{stage.intitule}</span>
+            </div>
+          </div>
           <span className={`badge badge-dot ${statut.badge}`}>{statut.label}</span>
-          <span><Icon name="building" size={13} /> {serviceNom || "—"}</span>
-          <span><Icon name="userCheck" size={13} /> {tuteurNom || "Encadrant non assigné"}</span>
-          <span><Icon name="calendar" size={13} /> {formatDate(stage.date_debut)} → {formatDate(stage.date_fin)}</span>
-        </div>
+          <dl className="wf-summary-infos">
+            <div>
+              <dt><Icon name="building" size={13} /> Service</dt>
+              <dd>{serviceNom || "—"}</dd>
+            </div>
+            <div>
+              <dt><Icon name="userCheck" size={13} /> Encadrant</dt>
+              <dd>{tuteurNom || "Non assigné"}</dd>
+            </div>
+            <div>
+              <dt><Icon name="calendar" size={13} /> Période</dt>
+              <dd>
+                {formatDate(stage.date_debut)} → {formatDate(stage.date_fin)}
+              </dd>
+            </div>
+          </dl>
+          {/* Progression des 4 étapes */}
+          <ol className="wf-summary-steps">
+            {["Documents", "Évaluation", "Validation RH", "Clôture"].map((label, i) => {
+              const n = i + 1;
+              const fait = n === 1 ? manquants.length === 0 : etape > n;
+              const enCours = !fait && etape === n;
+              return (
+                <li key={label} className={fait ? "is-done" : enCours ? "is-current" : ""}>
+                  <span>{fait ? <Icon name="check" size={12} strokeWidth={2.6} /> : n}</span>
+                  {label}
+                </li>
+              );
+            })}
+          </ol>
+        </aside>
 
         <div className="modal-body wf-body">
           {error && (
@@ -269,6 +333,18 @@ function StageWorkflow({ stage: initialStage, stagiaire, tuteurNom, serviceNom, 
                           {d.nom_fichier}
                         </a>
                         <span className="wf-doc-type">{d.type_precision || LIBELLES_TYPES[d.type_doc] || d.type_doc}</span>
+                        {peutAjouter && d.type_doc !== "FICHE_NOTES" && (
+                          <button
+                            type="button"
+                            className="wf-doc-delete"
+                            onClick={() => supprimerDocument(d)}
+                            disabled={busy === `suppr-${d.id}`}
+                            title="Supprimer ce document"
+                            aria-label={`Supprimer ${d.nom_fichier}`}
+                          >
+                            {busy === `suppr-${d.id}` ? <span className="spinner spinner-dark" /> : <Icon name="trash" size={13} />}
+                          </button>
+                        )}
                       </li>
                     ))}
                   </ul>
@@ -309,11 +385,22 @@ function StageWorkflow({ stage: initialStage, stagiaire, tuteurNom, serviceNom, 
                         required
                       />
                     )}
-                    <label className="wf-file">
-                      <Icon name="upload" size={16} />
+                    <div className={`wf-file ${file ? "has-file" : ""}`}>
+                      <Icon name={file ? "fileText" : "upload"} size={16} />
                       <span>{file ? file.name : "Choisir un fichier (PDF, Word, image…)"}</span>
-                      <input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} />
-                    </label>
+                      {!file && <input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} />}
+                      {file && (
+                        <button
+                          type="button"
+                          className="wf-file-remove"
+                          onClick={() => setFile(null)}
+                          title="Retirer ce fichier"
+                          aria-label="Retirer le fichier choisi"
+                        >
+                          <Icon name="x" size={14} />
+                        </button>
+                      )}
+                    </div>
                     <div className="wf-actions">
                       <button type="button" className="btn btn-ghost btn-sm" onClick={() => setShowUpload(false)}>
                         Annuler
@@ -530,6 +617,7 @@ function StageWorkflow({ stage: initialStage, stagiaire, tuteurNom, serviceNom, 
               </p>
             )}
           </Step>
+        </div>
         </div>
       </div>
     </div>

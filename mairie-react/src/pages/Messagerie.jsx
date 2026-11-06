@@ -10,6 +10,7 @@ import { ROLES } from "../utils/roles";
 import { navigate, pathSegments, usePath } from "../utils/router";
 import { isSoundEnabled, playMessageSound, setSoundEnabled } from "../utils/notificationSound";
 import { SkeletonChatList, SkeletonThread } from "../components/ui/Skeleton";
+import { confirmer } from "../utils/confirm";
 
 const LIST_POLL_MS = 8000; // rafraîchissement de la liste des conversations
 const THREAD_POLL_MS = 4000; // rafraîchissement de la conversation ouverte
@@ -320,11 +321,15 @@ function Messagerie() {
 
   const deleteConversation = async () => {
     const qui = thread?.interlocuteur;
-    const ok = window.confirm(
-      `Supprimer la conversation avec ${qui?.nom_affiche || "ce contact"} ?\n\n` +
+    const ok = await confirmer({
+      titre: "Supprimer cette conversation ?",
+      message: `Conversation avec ${qui?.nom_affiche || "ce contact"}`,
+      details:
         `Elle sera effacée de votre messagerie uniquement : ${qui?.prenom || "votre interlocuteur"} la conservera. ` +
         "Le brouillon éventuel sera aussi effacé.",
-    );
+      confirmer: "Supprimer",
+      danger: true,
+    });
     if (!ok) return;
     try {
       savedDraftRef.current = draftRef.current; // rien à enregistrer en quittant

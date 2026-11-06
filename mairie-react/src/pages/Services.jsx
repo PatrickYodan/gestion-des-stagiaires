@@ -10,6 +10,7 @@ import EtablissementMap from "../components/services/EtablissementMap";
 import { etabMapQuery } from "../utils/etablissement";
 import { apiErrorMessage } from "../utils/format";
 import { SkeletonCards } from "../components/ui/Skeleton";
+import { confirmer } from "../utils/confirm";
 
 const emptyService = { nom: "", description: "" };
 const emptyEtab = { nom: "", ville: "", localisation: "", email_contact: "", telephone: "" };
@@ -157,7 +158,14 @@ function Services() {
   };
 
   const handleDelete = async (kind, item, warning) => {
-    if (!window.confirm(`Supprimer « ${item.nom} » ?${warning ? `\n\n${warning}` : ""}`)) return;
+    const ok = await confirmer({
+      titre: kind === "service" ? "Supprimer ce service ?" : "Supprimer cet établissement ?",
+      message: item.nom,
+      details: warning || "Cette action est définitive.",
+      confirmer: "Supprimer",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await api.delete(`${endpoint(kind)}${item.id}/`);
       loadData();

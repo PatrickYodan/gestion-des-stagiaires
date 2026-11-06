@@ -11,6 +11,8 @@ import { apiErrorMessage, formatNote, fullName, isNoted, noteBadge } from "../ut
 import { SkeletonRows } from "../components/ui/Skeleton";
 import StageWorkflow from "../components/stages/StageWorkflow";
 import { STATUTS, actionAttendue } from "../utils/workflow";
+import { confirmer } from "../utils/confirm";
+import Corbeille from "../components/ui/Corbeille";
 
 const emptyForm = {
   nom: "",
@@ -43,6 +45,7 @@ function Stagiaires() {
 
   // Stagiaire dont la fiche de note est affichée
   const [fiche, setFiche] = useState(null);
+  const [corbeille, setCorbeille] = useState(false); // fenêtre des stagiaires supprimés
   // Stage dont la fenêtre « Suivi » (documents, évaluation, validation RH) est ouverte
   const [suivi, setSuivi] = useState(null);
 
@@ -134,7 +137,14 @@ function Stagiaires() {
 
   // Suppression d'un stagiaire
   const handleDelete = async (item) => {
-    if (!window.confirm(`Êtes-vous sûr de vouloir supprimer ${fullName(item)} ?`)) return;
+    const ok = await confirmer({
+      titre: "Supprimer ce stagiaire ?",
+      message: fullName(item),
+      details: "Il n'apparaîtra plus dans la liste des stagiaires.",
+      confirmer: "Supprimer",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await api.delete(`stagiaires/${item.id}/`);
       // Retire le stagiaire de la liste affichée
@@ -190,13 +200,33 @@ function Stagiaires() {
           </p>
         </div>
 
-        {isGestionnaire && (
-          <button onClick={() => openForm()} className="btn btn-primary">
-            <Icon name="plus" size={18} />
-            <span className="btn-label">Nouveau stagiaire</span>
-          </button>
-        )}
+        <div className="page-header-actions">
+          {isGestionnaire && (
+            <button type="button" onClick={() => setCorbeille(true)} className="btn btn-secondary">
+              <Icon name="archive" size={17} />
+              <span className="btn-label">Corbeille</span>
+            </button>
+          )}
+          {isGestionnaire && (
+            <button onClick={() => openForm()} className="btn btn-primary">
+              <Icon name="plus" size={18} />
+              <span className="btn-label">Nouveau stagiaire</span>
+            </button>
+          )}
+        </div>
       </div>
+
+      {corbeille && (
+        <Corbeille
+          titre="Stagiaires supprimés"
+          libelle="stagiaire"
+          url="stagiaires/supprimes/"
+          restaurer={(id) => `stagiaires/${id}/restaurer/`}
+          detail={(item) => item.etablissement}
+          onClose={() => setCorbeille(false)}
+          onRestaure={() => loadData()}
+        />
+      )}
 
       {error && (
         <div className="alert alert-error">

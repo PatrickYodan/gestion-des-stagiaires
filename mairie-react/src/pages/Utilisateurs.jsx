@@ -12,19 +12,26 @@ import AccessMatrix from "../components/utilisateurs/AccessMatrix";
 import { apiErrorMessage, fullName } from "../utils/format";
 import { ROLES } from "../utils/roles";
 import { SkeletonRows } from "../components/ui/Skeleton";
+import { confirmer } from "../utils/confirm";
+import Corbeille from "../components/ui/Corbeille";
+import JournalAudit from "../components/utilisateurs/JournalAudit";
 
 function Utilisateurs() {
   const { user: currentUser } = useAuth();
+  const [corbeille, setCorbeille] = useState(false); // fenêtre des comptes supprimés
   const [utilisateurs, setUtilisateurs] = useState([]);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("ALL");
-  // Section lue dans l'adresse : /utilisateurs ou /utilisateurs/droits-acces
+  // Section lue dans l'adresse : /utilisateurs, /utilisateurs/droits-acces ou /utilisateurs/journal
   const path = usePath();
-  const view = pathSegments(path)[1] === "droits-acces" ? "acces" : "comptes";
-  const setView = (v) => navigate(v === "acces" ? "/utilisateurs/droits-acces" : "/utilisateurs");
+  const segment = pathSegments(path)[1];
+  const estAdmin = currentUser?.role === "ADMIN"; // le journal d'audit est réservé à l'administrateur
+  const view = segment === "droits-acces" ? "acces" : segment === "journal" && estAdmin ? "journal" : "comptes";
+  const setView = (v) =>
+    navigate(v === "acces" ? "/utilisateurs/droits-acces" : v === "journal" ? "/utilisateurs/journal" : "/utilisateurs");
   const [togglingId, setTogglingId] = useState(null);
   const [sendingId, setSendingId] = useState(null);
   const [invitation, setInvitation] = useState(null);
@@ -64,14 +71,24 @@ function Utilisateurs() {
   };
 
   const resendCredentials = async (u) => {
-    const message = u.doit_changer_mdp
-      ? `Renvoyer l'e-mail d'invitation à ${u.email} ?
-
-Un nouveau mot de passe provisoire sera généré.`
-      : `Réinitialiser le mot de passe de ${fullName(u)} ?
-
-Un mot de passe provisoire sera envoyé à ${u.email} et devra être changé à la prochaine connexion.`;
-    if (!window.confirm(message)) return;
+    const ok = await confirmer(
+      u.doit_changer_mdp
+        ? {
+            titre: "Renvoyer l'e-mail d'invitation ?",
+            message: u.email,
+            details: "Un nouveau mot de passe provisoire sera généré et envoyé.",
+            confirmer: "Renvoyer l'invitation",
+            icon: "mail",
+          }
+        : {
+            titre: "Réinitialiser le mot de passe ?",
+            message: `${fullName(u)} · ${u.email}`,
+            details: "Un mot de passe provisoire sera envoyé par e-mail et devra être changé à la prochaine connexion.",
+            confirmer: "Réinitialiser",
+            icon: "lock",
+          },
+    );
+    if (!ok) return;
     setSendingId(u.id);
     try {
       const res = await api.post(`utilisateurs/${u.id}/renvoyer-identifiants/`);
@@ -85,7 +102,14 @@ Un mot de passe provisoire sera envoyé à ${u.email} et devra être changé à 
   };
 
   const handleDelete = async (u) => {
-    if (!window.confirm(`Supprimer le compte de ${fullName(u)} (@${u.username}) ?`)) return;
+    const ok = await confirmer({
+      titre: "Supprimer ce compte ?",
+      message: `${fullName(u)} (@${u.username})`,
+      details: "La personne ne pourra plus se connecter. Cette action est définitive.",
+      confirmer: "Supprimer le compte",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await api.delete(`utilisateurs/${u.id}/`);
       setUtilisateurs(utilisateurs.filter((x) => x.id !== u.id));
@@ -120,13 +144,33 @@ Un mot de passe provisoire sera envoyé à ${u.email} et devra être changé à 
             Comptes de la plateforme et droits d'accès de chaque rôle aux différents modules
           </p>
         </div>
-        {view === "comptes" && (
-          <button onClick={() => openForm()} className="btn btn-primary">
-            <Icon name="plus" size={18} />
-            <span className="btn-label">Nouvel utilisateur</span>
-          </button>
-        )}
+        <div className="page-header-actions">
+          {view === "comptes" && (
+            <button type="button" onClick={() => setCorbeille(true)} className="btn btn-secondary">
+              <Icon name="archive" size={17} />
+              <span className="btn-label">Corbeille</span>
+            </button>
+          )}
+          {view === "comptes" && (
+            <button onClick={() => openForm()} className="btn btn-primary">
+              <Icon name="plus" size={18} />
+              <span className="btn-label">Nouvel utilisateur</span>
+            </button>
+          )}
+        </div>
       </div>
+
+      {corbeille && (
+        <Corbeille
+          titre="Comptes supprimés"
+          libelle="compte"
+          url="utilisateurs/supprimes/"
+          restaurer={(id) => `utilisateurs/${id}/restaurer/`}
+          detail={(item) => ({ ADMIN: "Administrateur", RH: "Agent RH", TUTEUR: "Tuteur" })[item.role]}
+          onClose={() => setCorbeille(false)}
+          onRestaure={() => loadData()}
+        />
+      )}
 
       <div className="segmented tabs-inline" role="tablist" aria-label="Section">
         <button
@@ -145,7 +189,19 @@ Un mot de passe provisoire sera envoyé à ${u.email} et devra être changé à 
         >
           <Icon name="shield" size={14} /> Droits d'accès
         </button>
+        {estAdmin && (
+          <button
+            role="tab"
+            aria-selected={view === "journal"}
+            className={view === "journal" ? "active" : ""}
+            onClick={() => setView("journal")}
+          >
+            <Icon name="clock" size={14} /> Journal d'audit
+          </button>
+        )}
       </div>
+
+      {view === "journal" && <JournalAudit />}
 
       {view === "acces" && (
         <div className="card">

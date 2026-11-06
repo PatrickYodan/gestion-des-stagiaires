@@ -18,6 +18,7 @@ import {
 } from "../utils/format";
 import StageWorkflow from "../components/stages/StageWorkflow";
 import { STATUTS, STATUTS_MANUELS, actionAttendue } from "../utils/workflow";
+import { confirmer } from "../utils/confirm";
 
 // Dates courtes dans le tableau (ex. 01/09/2026) pour garder la colonne Période compacte
 const SHORT_DATE = { day: "2-digit", month: "2-digit", year: "numeric" };
@@ -219,12 +220,14 @@ function Stages() {
   };
 
   const handleDelete = async (stage) => {
-    if (
-      !window.confirm(
-        `Supprimer le stage « ${stage.intitule} » ?\nLes documents associés seront également supprimés.`,
-      )
-    )
-      return;
+    const ok = await confirmer({
+      titre: "Supprimer ce stage ?",
+      message: stage.intitule,
+      details: "Les documents associés (convention, attestation, rapport, fiche de notes) seront également supprimés.",
+      confirmer: "Supprimer",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await api.delete(`stages/${stage.id}/`);
       setStages(stages.filter((s) => s.id !== stage.id));

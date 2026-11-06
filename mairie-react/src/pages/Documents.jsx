@@ -6,6 +6,7 @@ import Icon from "../components/ui/Icon";
 import Modal from "../components/ui/Modal";
 import { apiErrorMessage, formatDate, fullName } from "../utils/format";
 import { SkeletonCards } from "../components/ui/Skeleton";
+import { confirmer } from "../utils/confirm";
 
 const TYPES = {
   CONVENTIONS: { label: "Convention de stage", short: "Conventions", tone: "tone-blue", badge: "badge-blue", icon: "clipboard" },
@@ -131,7 +132,14 @@ function Documents() {
   };
 
   const handleDelete = async (doc) => {
-    if (!window.confirm(`Supprimer le document « ${doc.nom_fichier} » ?`)) return;
+    const ok = await confirmer({
+      titre: "Supprimer ce document ?",
+      message: doc.nom_fichier,
+      details: "Le fichier sera définitivement effacé.",
+      confirmer: "Supprimer",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await api.delete(`documents/${doc.id}/`);
       setDocuments(documents.filter((d) => d.id !== doc.id));

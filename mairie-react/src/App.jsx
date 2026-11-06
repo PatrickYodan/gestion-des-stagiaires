@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import Loader from "./components/ui/Loader";
+import IntroDepart from "./components/layout/IntroDepart";
 import Sidebar from "./components/layout/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import Stagiaires from "./pages/Stagiaires";
@@ -54,6 +55,11 @@ function App() {
   const path = usePath();
   const activeTab = tabFromPath(path);
   const setActiveTab = (tab) => navigate(ROUTES[tab]);
+  // Animation d'accueil (stagiaire qui part de chez lui pour la mairie) avant la connexion.
+  // Rien n'est mémorisé : elle se rejoue à chaque chargement / actualisation de la page,
+  // mais pas en naviguant dans l'application (déconnexion, retour depuis « mot de passe oublié »).
+  const [introVue, setIntroVue] = useState(false);
+  const finIntro = () => setIntroVue(true);
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile : menu ouvert par-dessus
   const [collapsed, setCollapsed] = useState(() => {
     try {
@@ -150,6 +156,7 @@ function App() {
   if (!user) {
     if (path === FORGOT_PATH) return <MotDePasseOublie />;
     if (path === RESET_PATH) return <ReinitialiserMotDePasse />;
+    if (!introVue) return <IntroDepart onDone={finIntro} />;
     return <Login />;
   }
 

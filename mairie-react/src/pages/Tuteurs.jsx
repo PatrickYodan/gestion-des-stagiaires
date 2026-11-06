@@ -9,10 +9,13 @@ import UserFormModal from "../components/utilisateurs/UserFormModal";
 import InvitationNotice from "../components/utilisateurs/InvitationNotice";
 import { apiErrorMessage, fullName } from "../utils/format";
 import { SkeletonRows } from "../components/ui/Skeleton";
+import { confirmer } from "../utils/confirm";
+import Corbeille from "../components/ui/Corbeille";
 
 function Tuteurs() {
   const { can } = useAuth();
   const canEdit = can("tuteurs", 2); // accès complet : ajout / modification des comptes tuteurs
+  const [corbeille, setCorbeille] = useState(false); // fenêtre des encadrants supprimés
 
   const [tuteurs, setTuteurs] = useState([]);
   const [services, setServices] = useState([]);
@@ -75,14 +78,24 @@ function Tuteurs() {
 
   // Renvoie un nouveau mot de passe provisoire par e-mail (invitation ou réinitialisation)
   const resendCredentials = async (t) => {
-    const message = t.doit_changer_mdp
-      ? `Renvoyer l'e-mail d'invitation à ${t.email} ?
-
-Un nouveau mot de passe provisoire sera généré.`
-      : `Réinitialiser le mot de passe de ${fullName(t)} ?
-
-Un mot de passe provisoire sera envoyé à ${t.email} et devra être changé à la prochaine connexion.`;
-    if (!window.confirm(message)) return;
+    const ok = await confirmer(
+      t.doit_changer_mdp
+        ? {
+            titre: "Renvoyer l'e-mail d'invitation ?",
+            message: t.email,
+            details: "Un nouveau mot de passe provisoire sera généré et envoyé.",
+            confirmer: "Renvoyer l'invitation",
+            icon: "mail",
+          }
+        : {
+            titre: "Réinitialiser le mot de passe ?",
+            message: `${fullName(t)} · ${t.email}`,
+            details: "Un mot de passe provisoire sera envoyé par e-mail et devra être changé à la prochaine connexion.",
+            confirmer: "Réinitialiser",
+            icon: "lock",
+          },
+    );
+    if (!ok) return;
     setSendingId(t.id);
     try {
       const res = await api.post(`utilisateurs/${t.id}/renvoyer-identifiants/`);
@@ -100,7 +113,14 @@ Un mot de passe provisoire sera envoyé à ${t.email} et devra être changé à 
     const warning = total
       ? `\n\n${total} stage${total > 1 ? "s" : ""} n'aura${total > 1 ? "ont" : ""} plus de tuteur assigné.`
       : "";
-    if (!window.confirm(`Supprimer le compte de ${fullName(t)} (@${t.username}) ?${warning}`)) return;
+    const ok = await confirmer({
+      titre: "Supprimer ce compte encadrant ?",
+      message: `${fullName(t)} (@${t.username})`,
+      details: warning.trim() || "La personne ne pourra plus se connecter. Cette action est définitive.",
+      confirmer: "Supprimer le compte",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await api.delete(`utilisateurs/${t.id}/`);
       setTuteurs(tuteurs.filter((x) => x.id !== t.id));
@@ -129,13 +149,33 @@ Un mot de passe provisoire sera envoyé à ${t.email} et devra être changé à 
             Agents municipaux encadrant les stagiaires dans les différents services
           </p>
         </div>
-        {canEdit && (
-          <button onClick={() => setEditing({ item: null })} className="btn btn-primary">
-            <Icon name="plus" size={18} />
-            <span className="btn-label">Nouvel encadrant</span>
-          </button>
-        )}
+        <div className="page-header-actions">
+          {canEdit && (
+            <button type="button" onClick={() => setCorbeille(true)} className="btn btn-secondary">
+              <Icon name="archive" size={17} />
+              <span className="btn-label">Corbeille</span>
+            </button>
+          )}
+          {canEdit && (
+            <button onClick={() => setEditing({ item: null })} className="btn btn-primary">
+              <Icon name="plus" size={18} />
+              <span className="btn-label">Nouvel encadrant</span>
+            </button>
+          )}
+        </div>
       </div>
+
+      {corbeille && (
+        <Corbeille
+          titre="Encadrants supprimés"
+          libelle="encadrant"
+          url="utilisateurs/supprimes/?role=TUTEUR"
+          restaurer={(id) => `utilisateurs/${id}/restaurer/`}
+          detail={(item) => item.service}
+          onClose={() => setCorbeille(false)}
+          onRestaure={() => loadData()}
+        />
+      )}
 
       <InvitationNotice invitation={invitation} onClose={() => setInvitation(null)} />
 
