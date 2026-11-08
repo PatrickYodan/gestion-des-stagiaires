@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import Icon from "../ui/Icon";
 import { apiErrorMessage } from "../../utils/format";
 import { SkeletonRows } from "../ui/Skeleton";
+import LoadingState from "../ui/LoadingState";
 
 const LEVELS = [
   { value: 0, label: "Aucun", hint: "Onglet masqué" },
@@ -48,7 +49,9 @@ function AccessMatrix({ userCounts = {} }) {
 
   if (loading) {
     return (
-      <SkeletonRows rows={6} columns={3} />
+      <LoadingState contexte="acces">
+        <SkeletonRows rows={6} columns={3} />
+      </LoadingState>
     );
   }
 

@@ -9,6 +9,7 @@ import UserFormModal from "../components/utilisateurs/UserFormModal";
 import InvitationNotice from "../components/utilisateurs/InvitationNotice";
 import { apiErrorMessage, fullName } from "../utils/format";
 import { SkeletonRows } from "../components/ui/Skeleton";
+import LoadingState from "../components/ui/LoadingState";
 import { confirmer } from "../utils/confirm";
 import Corbeille from "../components/ui/Corbeille";
 
@@ -220,7 +221,9 @@ function Tuteurs() {
         </div>
 
         {loading ? (
-          <SkeletonRows rows={5} columns={3} />
+          <LoadingState contexte="tuteurs">
+            <SkeletonRows rows={5} columns={3} />
+          </LoadingState>
         ) : filtered.length === 0 ? (
           <EmptyState
             icon="userCheck"

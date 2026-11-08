@@ -3,6 +3,8 @@ import api from "../../api/axios";
 import Icon from "../ui/Icon";
 import EmptyState from "../ui/EmptyState";
 import { apiErrorMessage } from "../../utils/format";
+import LoadingState from "../ui/LoadingState";
+import { SkeletonTimeline } from "../ui/Skeleton";
 
 // Journal d'audit (administrateur) : qui a fait quoi, quand, depuis quelle adresse IP.
 // Filtres par catégorie, auteur, période et texte ; détail des champs modifiés ; export CSV.
@@ -278,11 +280,9 @@ function JournalAudit() {
       )}
 
       {chargementFiltres && !entrees.length ? (
-        <div className="journal-list">
-          {[0, 1, 2, 3, 4].map((i) => (
-            <div key={i} className="skeleton" style={{ height: 58, marginBottom: 8 }} />
-          ))}
-        </div>
+        <LoadingState contexte="journal">
+          <SkeletonTimeline rows={5} />
+        </LoadingState>
       ) : entrees.length === 0 ? (
         <EmptyState
           icon="archive"

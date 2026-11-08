@@ -101,4 +101,58 @@ export function SkeletonThread() {
   );
 }
 
+// Mon compte : carte de profil (bandeau, photo, identité) et carte de formulaire
+export function SkeletonProfile() {
+  return (
+    <div className="account-grid sk-profile" role="status" aria-label="Chargement du profil">
+      <div className="sk-card sk-profile-card" style={{ "--i": 0 }}>
+        <span className="skeleton sk-profile-cover" />
+        <Bone className="sk-profile-avatar" w={84} h={84} r="50%" />
+        <div className="sk-lines sk-center">
+          <Bone w="48%" h={15} />
+          <Bone w="32%" h={10} />
+        </div>
+        {[0, 1, 2].map((i) => (
+          <div className="sk-field-row" key={i}>
+            <Bone w={34} h={34} r={10} />
+            <div className="sk-lines">
+              <Bone w="30%" h={9} />
+              <Bone w={`${66 - i * 12}%`} h={11} />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="sk-card" style={{ "--i": 1 }}>
+        <Bone w="42%" h={14} />
+        <Bone w="70%" h={10} />
+        {[0, 1, 2].map((i) => (
+          <div className="sk-field" key={i}>
+            <Bone w="28%" h={9} />
+            <Bone w="100%" h={40} r={10} />
+          </div>
+        ))}
+        <Bone w={150} h={40} r={10} />
+      </div>
+    </div>
+  );
+}
+
+// Journal d'activité : pastille d'action, description et date
+export function SkeletonTimeline({ rows = 5 }) {
+  return (
+    <div className="sk-timeline" role="status" aria-label="Chargement du journal">
+      {Array.from({ length: rows }, (_, i) => (
+        <div className="sk-timeline-item" key={i} style={{ "--i": i }}>
+          <Bone w={34} h={34} r="50%" />
+          <div className="sk-lines">
+            <Bone w={`${58 - (i % 3) * 9}%`} h={11} />
+            <Bone w={`${34 - (i % 2) * 8}%`} h={9} />
+          </div>
+          <Bone w={72} h={10} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default Bone;

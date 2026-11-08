@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import Icon from "../components/ui/Icon";
 import EmptyState from "../components/ui/EmptyState";
 import { SkeletonChart } from "../components/ui/Skeleton";
+import LoadingState from "../components/ui/LoadingState";
 import {
   ResponsiveContainer,
   BarChart,
@@ -338,7 +339,9 @@ function Dashboard() {
 
         <div className="card-body">
           {loading ? (
-            <SkeletonChart height={isMobile ? 240 : 300} />
+            <LoadingState contexte="tableau">
+              <SkeletonChart height={isMobile ? 220 : 270} />
+            </LoadingState>
           ) : totalStages === 0 ? (
             <EmptyState
               icon="clipboard"

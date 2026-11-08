@@ -7,6 +7,7 @@ from rest_framework import serializers
 # CORRECTION 2 : Alias pour vos serializers locaux (si nécessaire)
 from mairies import serializers as mairies_serializers 
 from mairies.views import (
+    JournalAuditView,
     AccesView,
     ChangerMotDePasseView,
     DashboardStatsView,
@@ -29,6 +30,7 @@ from mairies.messagerie import (
     NonLusView,
 )
 from rest_framework.routers import DefaultRouter
+from mairies.audit import journaliser
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -44,14 +46,24 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
   }
 
   def validate(self, attrs):
-    # Validation e-mail / mot de passe
-    data = super().validate(attrs)
+    request = self.context.get('request')
+    email = str(attrs.get('email', '')).strip()
+    # Validation e-mail / mot de passe (échec tracé dans le journal d'audit)
+    try:
+        data = super().validate(attrs)
+    except Exception:
+        journaliser(request, 'connexion', 'echec_connexion', f'Échec de connexion ({email})',
+                    details={'email': email}, succes=False)
+        raise
 
     # Si l'utilisateur est inactif, il ne se connecte pas sur le site
     if self.user.statut_compte == 'INACTIF':
+        journaliser(request, 'connexion', 'echec_connexion', f'Connexion refusée : compte inactif ({email})',
+                    details={'email': email}, succes=False, utilisateur=self.user)
         raise serializers.ValidationError(
             {"detail": "Votre compte est inactif. Veuillez contacter un administrateur."}
         )
+    journaliser(request, 'connexion', 'connexion', 'Connexion', objet=self.user, utilisateur=self.user)
 
     # Enrichissement de la réponse JSON si le compte est actif
     data['id'] = self.user.id
@@ -101,6 +113,7 @@ urlpatterns = [
     ),
     # Droits d'accès par rôle (lecture : connecté, modification : administrateur)
     path('api/acces/', AccesView.as_view(), name='acces'),
+    path('api/journal/', JournalAuditView.as_view(), name='journal'),
     # Mot de passe oublié (accessible sans être connecté)
     path('api/mot-de-passe-oublie/', MotDePasseOublieView.as_view(), name='mot-de-passe-oublie'),
     path(

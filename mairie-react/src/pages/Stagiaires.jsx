@@ -9,6 +9,7 @@ import ServiceGlyph from "../components/services/ServiceGlyph";
 import Modal from "../components/ui/Modal";
 import { apiErrorMessage, formatNote, fullName, isNoted, noteBadge } from "../utils/format";
 import { SkeletonRows } from "../components/ui/Skeleton";
+import LoadingState from "../components/ui/LoadingState";
 import StageWorkflow from "../components/stages/StageWorkflow";
 import { STATUTS, actionAttendue } from "../utils/workflow";
 import { confirmer } from "../utils/confirm";
@@ -274,7 +275,9 @@ function Stagiaires() {
         </div>
 
         {loading ? (
-          <SkeletonRows rows={5} columns={3} />
+          <LoadingState contexte="stagiaires">
+            <SkeletonRows rows={5} columns={3} />
+          </LoadingState>
         ) : filtered.length === 0 ? (
           <EmptyState
             icon="graduation"

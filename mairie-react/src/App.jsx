@@ -5,6 +5,7 @@ import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import Loader from "./components/ui/Loader";
 import IntroDepart from "./components/layout/IntroDepart";
+import { ROLE_LABELS } from "./utils/chargements";
 import Sidebar from "./components/layout/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import Stagiaires from "./pages/Stagiaires";
@@ -58,8 +59,9 @@ function App() {
   // Animation d'accueil (stagiaire qui part de chez lui pour la mairie) avant la connexion.
   // Rien n'est mémorisé : elle se rejoue à chaque chargement / actualisation de la page,
   // mais pas en naviguant dans l'application (déconnexion, retour depuis « mot de passe oublié »).
-  const [introVue, setIntroVue] = useState(false);
-  const finIntro = () => setIntroVue(true);
+  // Phases : "scene" (animation seule) → "sortie" (connexion affichée dessous, la scène se replie
+  // sur son panneau bleu) → "finie".
+  const [intro, setIntro] = useState("scene");
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile : menu ouvert par-dessus
   const [collapsed, setCollapsed] = useState(() => {
     try {
@@ -156,8 +158,15 @@ function App() {
   if (!user) {
     if (path === FORGOT_PATH) return <MotDePasseOublie />;
     if (path === RESET_PATH) return <ReinitialiserMotDePasse />;
-    if (!introVue) return <IntroDepart onDone={finIntro} />;
-    return <Login />;
+    // Même structure à chaque phase : ni l'intro ni la connexion ne sont remontées en cours de route
+    return (
+      <>
+        {intro !== "scene" && <Login />}
+        {intro !== "finie" && (
+          <IntroDepart onSortie={() => setIntro("sortie")} onDone={() => setIntro("finie")} />
+        )}
+      </>
+    );
   }
 
   // Compte créé avec un mot de passe provisoire : identité + nouveau mot de passe d'abord
@@ -166,11 +175,24 @@ function App() {
   }
 
   if (!accessReady || splashEnCours) {
+    // Salutation selon l'heure
+    const salutation = new Date().getHours() >= 18 ? "Bonsoir" : "Bonjour";
     return (
       <div className="app-loading">
         <Loader
           label="Chargement de votre espace"
-          greeting={user.prenom ? `Bonjour ${user.prenom}` : "Bonjour"}
+          greeting={`${salutation}${user.prenom ? ` ${user.prenom}` : ""}`}
+          subtitle={ROLE_LABELS[user.role] ? `Espace ${ROLE_LABELS[user.role]}` : ""}
+          steps={[
+            { label: "Connexion sécurisée", done: true },
+            { label: "Droits d'accès de votre rôle", done: accessReady },
+            {
+              label: currentTab
+                ? `Ouverture : ${currentTab === "stagiaires" && user.role === "TUTEUR" ? "Mes Stagiaires" : TITLES[currentTab]}`
+                : "Préparation de votre espace",
+              done: Boolean(currentTab),
+            },
+          ]}
           duration={splashVu ? 0 : SPLASH_MS}
         />
       </div>

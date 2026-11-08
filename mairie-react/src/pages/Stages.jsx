@@ -7,6 +7,7 @@ import Icon from "../components/ui/Icon";
 import ServiceGlyph from "../components/services/ServiceGlyph";
 import Modal from "../components/ui/Modal";
 import { SkeletonRows } from "../components/ui/Skeleton";
+import LoadingState from "../components/ui/LoadingState";
 import {
   apiErrorMessage,
   formatDate,
@@ -348,7 +349,9 @@ function Stages() {
         </div>
 
         {loading ? (
-          <SkeletonRows rows={5} columns={3} />
+          <LoadingState contexte="stages">
+            <SkeletonRows rows={5} columns={3} />
+          </LoadingState>
         ) : filtered.length === 0 ? (
           <EmptyState
             icon="clipboard"

@@ -72,6 +72,15 @@ class Utilisateur(AbstractUser):
         related_name='tuteurs',
     )
 
+    # Suppression « douce » : le compte disparaît de l'application mais reste en base, désactivé.
+    # L'e-mail est mis de côté (email_supprime) pour pouvoir le réutiliser sur un nouveau compte.
+    est_supprime = models.BooleanField(default=False, verbose_name='Supprimé')
+    supprime_le = models.DateTimeField(null=True, blank=True, verbose_name='Supprimé le')
+    supprime_par = models.ForeignKey(
+        'self', on_delete=models.SET_NULL, null=True, blank=True, related_name='comptes_supprimes'
+    )
+    email_supprime = models.EmailField(blank=True, default='', verbose_name="E-mail avant suppression")
+
     groups = models.ManyToManyField(
         Group,
         verbose_name='groups',
@@ -114,7 +123,15 @@ class Stagiaire(models.Model):
     
     adresse = models.TextField(blank=True, null=True)
     niveau_etudes = models.TextField()
+    # Suppression « douce » : le stagiaire est masqué dans l'application mais reste en base.
+    # L'e-mail d'origine est conservé dans email_supprime ; le champ email reçoit une valeur neutre
+    # pour qu'un nouveau dossier puisse être créé avec la même adresse.
     is_deleted = models.BooleanField(default=False)
+    supprime_le = models.DateTimeField(null=True, blank=True, verbose_name='Supprimé le')
+    supprime_par = models.ForeignKey(
+        'Utilisateur', on_delete=models.SET_NULL, null=True, blank=True, related_name='stagiaires_supprimes'
+    )
+    email_supprime = models.EmailField(blank=True, default='', verbose_name="E-mail avant suppression")
     etablissement = models.ForeignKey(
         Etablissement,
         on_delete=models.SET_NULL,
@@ -284,3 +301,42 @@ class EtatConversation(models.Model):
 
     def __str__(self):
         return f'{self.utilisateur} — conversation {self.conversation_id}'
+
+
+class JournalAudit(models.Model):
+    """Journal d'audit : trace des actions des utilisateurs, consultable par l'administrateur.
+    Le nom et le rôle de l'auteur sont copiés au moment de l'action (lisibles même si le compte change)."""
+
+    CATEGORIES = [
+        ('connexion', 'Connexion'),
+        ('compte', 'Comptes'),
+        ('stagiaire', 'Stagiaires'),
+        ('stage', 'Stages'),
+        ('document', 'Documents'),
+        ('service', 'Services'),
+        ('etablissement', 'Établissements'),
+        ('droits', "Droits d'accès"),
+        ('securite', 'Sécurité'),
+    ]
+
+    date = models.DateTimeField(auto_now_add=True, db_index=True)
+    utilisateur = models.ForeignKey(
+        Utilisateur, on_delete=models.SET_NULL, null=True, blank=True, related_name='actions_journal'
+    )
+    utilisateur_nom = models.CharField(max_length=200, blank=True, default='')
+    role = models.CharField(max_length=10, blank=True, default='')
+    categorie = models.CharField(max_length=20, choices=CATEGORIES, db_index=True)
+    action = models.CharField(max_length=40, db_index=True)  # ex. creation, modification, suppression…
+    libelle = models.CharField(max_length=255)  # phrase lisible : « Suppression du stagiaire Jean Dupont »
+    objet_type = models.CharField(max_length=40, blank=True, default='')
+    objet_id = models.IntegerField(null=True, blank=True)
+    details = models.JSONField(default=dict, blank=True)  # ex. champs modifiés {champ: [avant, après]}
+    ip = models.GenericIPAddressField(null=True, blank=True)
+    succes = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-date', '-id']
+
+    def __str__(self):
+        return f'{self.date:%d/%m/%Y %H:%M} — {self.utilisateur_nom} — {self.libelle}'
+

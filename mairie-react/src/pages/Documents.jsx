@@ -6,6 +6,7 @@ import Icon from "../components/ui/Icon";
 import Modal from "../components/ui/Modal";
 import { apiErrorMessage, formatDate, fullName } from "../utils/format";
 import { SkeletonCards } from "../components/ui/Skeleton";
+import LoadingState from "../components/ui/LoadingState";
 import { confirmer } from "../utils/confirm";
 
 const TYPES = {
@@ -221,7 +222,9 @@ function Documents() {
         </div>
 
         {loading ? (
-          <SkeletonCards count={6} />
+          <LoadingState contexte="documents">
+            <SkeletonCards count={6} />
+          </LoadingState>
         ) : filtered.length === 0 ? (
           <EmptyState
             icon="folder"

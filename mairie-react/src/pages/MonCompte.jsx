@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
+import LoadingState from "../components/ui/LoadingState";
+import { SkeletonProfile } from "../components/ui/Skeleton";
 import Avatar from "../components/ui/Avatar";
 import Icon from "../components/ui/Icon";
 import { apiErrorMessage, fullName } from "../utils/format";
@@ -171,10 +173,9 @@ function MonCompte() {
 
   if (loading) {
     return (
-      <div className="account-grid">
-        <div className="skeleton" style={{ height: 360 }} />
-        <div className="skeleton" style={{ height: 360 }} />
-      </div>
+      <LoadingState contexte="compte">
+        <SkeletonProfile />
+      </LoadingState>
     );
   }
 

@@ -12,6 +12,7 @@ import AccessMatrix from "../components/utilisateurs/AccessMatrix";
 import { apiErrorMessage, fullName } from "../utils/format";
 import { ROLES } from "../utils/roles";
 import { SkeletonRows } from "../components/ui/Skeleton";
+import LoadingState from "../components/ui/LoadingState";
 import { confirmer } from "../utils/confirm";
 import Corbeille from "../components/ui/Corbeille";
 import JournalAudit from "../components/utilisateurs/JournalAudit";
@@ -259,7 +260,9 @@ function Utilisateurs() {
         </div>
 
         {loading ? (
-          <SkeletonRows rows={5} columns={3} />
+          <LoadingState contexte="utilisateurs">
+            <SkeletonRows rows={5} columns={3} />
+          </LoadingState>
         ) : filtered.length === 0 ? (
           <EmptyState
             icon="users"

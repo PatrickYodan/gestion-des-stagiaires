@@ -10,6 +10,7 @@ import EtablissementMap from "../components/services/EtablissementMap";
 import { etabMapQuery } from "../utils/etablissement";
 import { apiErrorMessage } from "../utils/format";
 import { SkeletonCards } from "../components/ui/Skeleton";
+import LoadingState from "../components/ui/LoadingState";
 import { confirmer } from "../utils/confirm";
 
 const emptyService = { nom: "", description: "" };
@@ -247,7 +248,9 @@ function Services() {
         </div>
 
         {loading ? (
-          <SkeletonCards count={6} />
+          <LoadingState contexte={isServices ? "services" : "etablissements"}>
+            <SkeletonCards count={6} />
+          </LoadingState>
         ) : isServices ? (
           filteredServices.length === 0 ? (
             <EmptyState
